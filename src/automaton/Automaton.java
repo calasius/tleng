@@ -3,6 +3,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.io.PrintWriter;
+import java.io.File;
 
 
 public class Automaton {
@@ -130,4 +132,42 @@ public class Automaton {
 		return finalStates;
 	}
 
+	public void makeDot( String filename) {
+		
+		try {
+		    
+			PrintWriter writer = new PrintWriter(filename, "UTF-8");
+			writer.println("strict digraph {\n rankdir=LR;\n");
+			writer.println("node [shape = none, label = \", width = 0, height = 0]; qd;");
+			writer.println("node [label=\"\\N\", width = 0.5, height = 0.5];");
+			
+			
+			// Imprimo los estados finales con doble circulo
+			writer.println("node [shape = doublecircle]; ");
+			
+			for (State s : this.finalStates) {
+				writer.println(s.getName() + ";\n");	// Imprimo cada nombre de los estados finales
+			}
+			
+			writer.println("node [shape = circle];");
+			
+			// Imprimo las transiciones con sus respectivos labels
+
+			
+			for (State src : this.transitions.keySet())
+			{
+				for(Character symbol :  transitions.get(src).keySet()) {
+					writer.println(src + " -> " + this.transitions.get(src).get(symbol) + "[label=\"" + symbol + "\"]" );	
+				}
+			}
+			
+			// Cierro el archivo
+			writer.println("}");
+			writer.close();
+			
+		    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+	}
+	
 }
