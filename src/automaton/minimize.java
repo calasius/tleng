@@ -1,5 +1,7 @@
 package automaton;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -39,6 +41,40 @@ public static Automaton minimize( Automaton aut1, Set<Character> sigma )  { //re
 	}while(HayNuevoConjunto);
 	
 	//Todos los elementos de ClasesEq que tienen algún elemento son un estado distinto para el autómata mínimo. Las transiciones son las de cada estado que componen cada clase de equivalencia. Los estados finales son las clases que contengan algún estado final. 
+	
+	// Creo los estados
+	int cantEstados = ultimoAgregado - 1;
+	int estados = State[cantEstados];
+	for (int i = 0; i < cantEstados; i++){
+		String name = "q" + Integer.toString(i);
+		State est = State(name);
+		estados[i] = est;
+	}
+
+	// Creo las transiciones
+	Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
+	
+	
+	for (int i = 0; i < cantEstados; i++){
+		State src= estados[i];
+	
+		for (Character label : sigma){ //para cada signo del alfabeto
+			State dst=transition(aut1,st,label);
+			//busco la clase de equivalencia a la que pertenece el estado tran
+			//para setear la transicion al estado de la clase de equivalencia
+			int claseStateDst = perteneceClaseNro (ClasesEq, dst,j);
+			Map<Character,State> map = new HashMap<Character,State>();
+			map.put(label,estados[claseStateDst]);
+			transiciones.put(src,map);
+		}
+	}
+
+	
+// FALTA AGREGAR LOS ESTADOS FINALES E INICIALES
+// como se cuales son los estados finales y cuales los iniciales? quizas hace falta agregar a la clase State si es un estado inicial, intermedio o final
+
+
+
 }
 
 int perteneceClaseNro (Set<State>[] ClasesEq, State est,  int j){
