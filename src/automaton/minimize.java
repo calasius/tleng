@@ -51,13 +51,28 @@ public static Automaton minimize( Automaton aut1, Set<Character> sigma )  { //re
 		estados[i] = est;
 	}
 
-	// Creo las transiciones
-	Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
 	
+	// Creo las transiciones y los estados iniciales y finales
+	Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
+	State initialState;
+	Set<State> finalStates = new HashSet<State>();
+	
+	// Me fijo en las clases de equivalencia si slos estados eran finales o iniciales en el automata original
 	
 	for (int i = 0; i < cantEstados; i++){
-		State src= estados[i];
-	
+		State src = estados[i];
+		int claseStateSrc = perteneceClaseNro (ClasesEq, src,i);
+		Iterator <Set <State> > it = ClasesEq[i].iterator();
+		State st=it.next();
+		
+		if(aut1.isFinal(st)){
+			finalStates.add(estados[i]);
+		}
+		
+		if(aut1.isInitial(st)){
+			initialState = new estados[i];
+		}
+		
 		for (Character label : sigma){ //para cada signo del alfabeto
 			State dst=transition(aut1,st,label);
 			//busco la clase de equivalencia a la que pertenece el estado tran
@@ -69,12 +84,7 @@ public static Automaton minimize( Automaton aut1, Set<Character> sigma )  { //re
 		}
 	}
 
-	
-// FALTA AGREGAR LOS ESTADOS FINALES E INICIALES
-// como se cuales son los estados finales y cuales los iniciales? quizas hace falta agregar a la clase State si es un estado inicial, intermedio o final
-
-
-
+	return new Automaton(sigma,transiciones,estados,initialState,finalStates);
 }
 
 int perteneceClaseNro (Set<State>[] ClasesEq, State est,  int j){
