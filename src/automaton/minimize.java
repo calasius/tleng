@@ -45,11 +45,20 @@ public static Set<State> distinguidos (Automaton aut1, Set<State>[] ClasesEq, in
 	Set <State> res = new HashSet<State>();
 	//Para cada estado de la clase de equivalencia j, quiero ver si haciendo la transición por el caracter s llego a estados que están en distintas clases de equivalencia. Si es así, entonces puedo distintiguir ese estado y agregarlo al conjunto que devuelvo.
 	Iterator <Set <State> > it = ClasesEq[j].iterator();
+	State st=it.next();
+	State tran=transition(aut1,st,s);
+	
+	//chequear que haya 2 tran que pertenezcan a 2 clases de equiivalencia distintas.
+	//Agregar a res los estados que tenga tran a la misma clase para separarlos de la clase original. 
+	
 	while(it.hasNext()){
 		State st=it.next();
-		State tran=transition(aut1,st,s);
-		//chequear que haya 2 tran que pertenezcan a 2 clases de equiivalencia distintas.
-		//Agregar a res los estados que tenga tran a la misma clase para separarlos de la clase original. 
-	}
+		State tran2=transition(aut1,st,s);
+		if (tran2 != tran){
+			res.add(tran2);
+		}
+		return res;
+	};
+		
 }
 
