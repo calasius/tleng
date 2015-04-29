@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import readers.AutomatonReader;
 import automaton.Automaton;
+import automaton.AutomatonReader;
 import automaton.State;
 
 public class AutomatonReaderTest {
