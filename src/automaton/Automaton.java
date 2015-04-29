@@ -39,6 +39,11 @@ public class Automaton {
 		return finalStates.contains(states[i]);
 	}
 	
+	public boolean isFinal(State st) {
+		return finalStates.contains(st);
+	}
+	
+	
 	public State transition(State q, Character label) {
 		return transitions.get(q).get(label);
 	}
@@ -169,5 +174,17 @@ public class Automaton {
 	        e.printStackTrace(); 
 	    }
 	}
+	
+public boolean reconoce(String str){
+	State tran = initialState;
+	for (int i = 0, n = str.length(); i < n; i++) {
+	    char c = str.charAt(i);
+	    Map<Character,State> map = transitions.get(initialState);
+	    tran = map.get(c);
+	}
+	
+	return isFinal(tran);
+	
+}
 	
 }
