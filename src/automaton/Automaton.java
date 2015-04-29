@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.io.PrintWriter;
-import java.io.File;
 import java.util.Iterator;
 
 
@@ -191,7 +190,6 @@ public boolean reconoce(String str){
 
 public Automaton minimize()  { 
 
-	int E = sigma.size();
 	Set<State> estadosFinales = getFinalStates();
 	Set<State> estadosNoFinales  = new HashSet<State>(Arrays.asList(getStates()));
 	
@@ -199,7 +197,7 @@ public Automaton minimize()  {
 	//En grupo A estan los estados finales. En el grupo B todos los que no son finales.
 	int n = getStates().length;		//n es la cantidad de estados
 	
-	Set<State>[] ClasesEq = new HashSet<State>[n]; //creo clases de equivalencia, espacio para n posibles. ¿Se inicializan vacios los conjuntos?
+	Set<State>[] ClasesEq = (HashSet<State>[]) new Set[n]; //creo clases de equivalencia, espacio para n posibles. ¿Se inicializan vacios los conjuntos?
 	ClasesEq[0] = estadosFinales;
 	ClasesEq[1] = estadosNoFinales;
 	int ultimoAgregado = 1; //registro ultimo indice
