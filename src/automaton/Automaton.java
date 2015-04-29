@@ -36,6 +36,10 @@ public class Automaton {
 		return this.states[i];
 	}
 	
+	public Set<Character> getSigma() {
+		return this.sigma;
+	}
+	
 	public boolean isFinal(int i) {
 		return finalStates.contains(states[i]);
 	}
@@ -306,6 +310,140 @@ public  Set<State> distinguidos ( Set<State>[] ClasesEq, int j, int n, Character
 	return res;
 		
 }
+
+//puede ser el automata vacio
+// con una transicon
+// concatenacion de automatas
+// estrella
+
+public Automaton unCaracter(Set<Character> sigma, Character a){
+	State initialSt = new State("q0");
+	State finalSt = new State("q1");
+	State[] estados = new State[] {initialSt,finalSt};
+	Set<State> estadosFinales = new HashSet<State>();
+	
+	Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
+	insertTransition(initialSt, finalSt, a, transiciones);
+	return new Automaton(sigma,transiciones, estados, initialSt, estadosFinales);
+}
+
+public Automaton concat(Automaton aut1, Automaton aut2){
+	
+	Set<Character> alfabeto = new HashSet<Character>(aut1.getSigma());
+	alfabeto.addAll(aut2.getSigma());
+	
+	State initialSt = new State("q0");
+	State finalSt = new State("q1");
+	State[] estados = new State[aut1.getStates().length + aut2.getStates().length + 2];
+	estados[0] = initialSt;
+	for (int i = 0 ; i < aut1.getStates().length; i++) {
+		estados[i+1] = aut1.getStates()[i];
+	}
+	
+	for (int i = 0 ; i < aut2.getStates().length; i++) {
+		estados[aut1.getStates().length+i+2] = aut2.getStates()[i];
+	}
+	
+	estados[aut1.getStates().length + aut2.getStates().length + 1] = finalSt;
+	
+	Set<State> estadosFinales = new HashSet<State>();
+	estadosFinales.add(finalSt);
+	
+	Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
+	
+	//Agrego las transiciones del nuevo estado inicial al estado inicial de cada automata
+	insertTransition(initialSt, aut1.getInitialState(), null, transiciones);
+	insertTransition(initialSt, aut2.getInitialState(), null, transiciones);
+	
+	// Agrego todas las transiciones del automata 1
+	for (State src : aut1.getStates()) {
+		for (Character c : aut1.getSigma()) {
+			State dst = aut1.transition(src, c);
+			insertTransition(src, dst, c, transiciones);
+		}
+	}
+
+	// Agrego todas las transiciones del automata 2
+	for (State src : aut2.getStates()) {
+		for (Character c : aut1.getSigma()) {
+			State dst = aut1.transition(src, c);
+			insertTransition(src, dst, c, transiciones);
+		}
+	}
+	
+
+	//Agrego las transiciones desde cada estado final al nuevo estado final
+	for(Iterator<State> iterator = aut1.getFinalStates().iterator(); iterator.hasNext();) {
+		State src = (State) iterator.next();
+		insertTransition(src, finalSt, null, transiciones);	
+	}
+	
+
+	//Agrego las transiciones desde cada estado final al nuevo estado final
+	for (Iterator<State> iterator = aut2.getFinalStates().iterator(); iterator.hasNext();) {
+		State src = (State) iterator.next();
+		insertTransition(src, finalSt, null, transiciones);
+	}
+	
+	
+	return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
+}
+
+
+public Automaton estrella(Automaton aut1){
+	
+	Set<Character> alfabeto = new HashSet<Character>(aut1.getSigma());
+	
+	State initialSt = new State("q0");
+	State finalSt = new State("q1");
+	State[] estados = new State[aut1.getStates().length +  2];
+	estados[0] = initialSt;
+	for (int i = 0 ; i < aut1.getStates().length; i++) {
+		estados[i+1] = aut1.getStates()[i];
+	}
+
+	
+	estados[aut1.getStates().length + 1] = finalSt;
+
+	Set<State> estadosFinales = new HashSet<State>();
+	estadosFinales.add(finalSt);
+
+	
+	Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
+
+	//Agrego la transicion lambda del nuevo estado inicial al nuevo estado final
+	insertTransition(initialSt, finalSt, null, transiciones);
+
+	
+	//Agrego las transiciones del nuevo estado inicial al estado inicial de cada automata
+	insertTransition(initialSt, aut1.getInitialState(), null, transiciones);
+	
+	// Agrego todas las transiciones del automata 1
+	for (State src : aut1.getStates()) {
+		for (Character c : aut1.getSigma()) {
+			State dst = aut1.transition(src, c);
+			insertTransition(src, dst, c, transiciones);
+		}
+	}
+
+	//Agrego las transiciones desde cada estado final al nuevo estado final
+		for(Iterator<State> iterator = aut1.getFinalStates().iterator(); iterator.hasNext();) {
+			State src = (State) iterator.next();
+			insertTransition(src, finalSt, null, transiciones);	
+		}
+	
+
+		//Agrego las transiciones desde cada estado final al estado inicial original del automata
+			for(Iterator<State> iterator = aut1.getFinalStates().iterator(); iterator.hasNext();) {
+				State src = (State) iterator.next();
+				insertTransition(src, aut1.getInitialState(), null, transiciones);	
+			}
+			
+		
+	return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
+}
+
+
 
 }
 
