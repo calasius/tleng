@@ -1,3 +1,10 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import automaton.Automaton;
+import automaton.AutomatonReader;
+import automaton.AutomatonWriter;
+
 
 public class AFD {
 	
@@ -131,9 +138,14 @@ public class AFD {
 	}
 
 	// Ejercicio 3.d
-	private static void ComputeDFAIntersection(String aut1, String aut2, String aut) throws NoSuchMethodException
+	private static void ComputeDFAIntersection(String aut1, String aut2, String aut) throws NoSuchMethodException, IOException
 	{
-		throw new NoSuchMethodException("Not implemented method: ComputeDFAIntersection");
+		AutomatonReader reader = new AutomatonReader();
+		AutomatonWriter writer = new AutomatonWriter();
+		Automaton automaton1 = reader.readAutomaton(aut1);
+		Automaton automaton2 = reader.readAutomaton(aut2);
+		Automaton intersection = Automaton.intersection(automaton1, automaton2);
+		writer.writeAutomaton(intersection, aut);
 	}
 
 	// Ejercicio 3.e

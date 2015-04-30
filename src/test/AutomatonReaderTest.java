@@ -14,7 +14,7 @@ public class AutomatonReaderTest {
 	@Test
 	public void test_read_one_node_automaton() throws FileNotFoundException {
 		AutomatonReader reader = new AutomatonReader();
-		Automaton automaton = reader.readAutomaton("/home/claudio/ejercicios/TP1-Tlen/src/test/oneNodeAutomaton.txt");
+		Automaton automaton = reader.readAutomaton("./automatas/oneNodeAutomaton.txt");
 		Assert.assertEquals(1, automaton.getStates().length);
 		Assert.assertEquals("q0", automaton.getInitialState().getName());
 		Assert.assertEquals(1, automaton.getFinalStates().size());

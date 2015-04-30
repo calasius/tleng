@@ -1,11 +1,16 @@
 package automaton;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.io.PrintWriter;
 import java.util.Iterator;
+
+import exceptions.NoTransitionException;
 
 
 public class Automaton {
@@ -14,6 +19,8 @@ public class Automaton {
 	
 	private final Map<State, Map<Character, State>> transitions;
 	
+
+
 	private final State[] states;
 	
 	private final State initialState;
@@ -32,8 +39,46 @@ public class Automaton {
 
 	}
 	
+	private boolean isComplete(Set<Character> sigma) {
+		Set<Character> newSigma = new HashSet<Character>();
+		newSigma.addAll(sigma);
+		newSigma.retainAll(this.getSigma());
+		for (Character label : newSigma) {
+			for (State state : this.getStates()) {
+				if (transition(state, label) == null) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	public void complete(Set<Character> sigma) {
+		if (!isComplete(sigma)) {
+			State[] newStates = Arrays.copyOf(this.getStates(), this.getStates().length+1);
+			State nullState = new State("NULL");
+			newStates[this.getStates().length] = nullState;
+			
+			Set<Character> newSigma = new HashSet<Character>();
+			newSigma.addAll(sigma);
+			newSigma.retainAll(this.getSigma());
+			
+			for (State state : newStates) {
+				for (Character label : newSigma) {
+					if (transition(state, label) == null) {
+						insertTransition(state, nullState, label, getTransitions());
+					}
+				}
+			}
+		}
+	}
+	
 	public State getStateNumber(int i) {
 		return this.states[i];
+	}
+	
+	public Map<State, Map<Character, State>> getTransitions() {
+		return transitions;
 	}
 	
 	public Set<Character> getSigma() {
@@ -50,6 +95,9 @@ public class Automaton {
 	
 	
 	public State transition(State q, Character label) {
+		if (transitions.isEmpty()) {
+			throw new NoTransitionException();
+		}
 		return transitions.get(q).get(label);
 	}
 	
@@ -68,7 +116,7 @@ public class Automaton {
 		//Estados de automata interseccion
 		int longStates1 = aut1.getStates().length;
 		int longStates2 = aut2.getStates().length;
-		State[] intersectionStates = new State[(longStates1 * longStates2) + 1];
+		State[] intersectionStates = new State[(longStates1 * longStates2)];
 		Set<State> finalStates = new HashSet<State>();
 		Map<String, Integer> aut1States = new HashMap<String, Integer>();
 		Map<String, Integer> aut2States = new HashMap<String, Integer>();
@@ -78,7 +126,7 @@ public class Automaton {
 				String nombre1 = aut1.getStates()[i].getName();
 				aut1States.put(nombre1, i);
 				String nombre2 = aut2.getStates()[j].getName();
-				aut1States.put(nombre2, j);
+				aut2States.put(nombre2, j);
 				State estado = new State(nombre1 + nombre2);
 				int position = i + (longStates2 * j); 
 				intersectionStates[position] = estado;	
@@ -443,8 +491,81 @@ public Automaton estrella(Automaton aut1){
 	return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
 }
 
+public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
+	
+	Set<Pair<State,State>> relation = new HashSet<Pair<State,State>>();
+	
+	Deque<Pair<State,State>> todo = new LinkedList<Pair<State,State>>();
+	todo.add(new Pair<State,State>(aut1.getInitialState(),aut2.getInitialState()));
+	
+	while (!todo.isEmpty()) {
+		Pair<State,State> pair = todo.removeFirst();
+		if (relation.contains(pair)) {
+			continue;
+		}
+		if (aut1.isFinal(pair.getX()) != aut2.isFinal(pair.getY())) {
+			return false;
+		}
+		
+	}
+	
+	
+	return false;
+}
 
 
+
+
+}
+
+class Pair<X,Y> {
+
+	private final X x;
+	private final Y y;
+	
+	public Pair(X x, Y y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((x == null) ? 0 : x.hashCode());
+		result = prime * result + ((y == null) ? 0 : y.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Pair other = (Pair) obj;
+		if (x == null) {
+			if (other.x != null)
+				return false;
+		} else if (!x.equals(other.x))
+			return false;
+		if (y == null) {
+			if (other.y != null)
+				return false;
+		} else if (!y.equals(other.y))
+			return false;
+		return true;
+	}
+
+	public X getX() {
+		return x;
+	}
+
+	public Y getY() {
+		return y;
+	}
 }
 
 

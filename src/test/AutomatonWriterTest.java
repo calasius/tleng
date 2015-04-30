@@ -20,7 +20,14 @@ public class AutomatonWriterTest {
 		sigma.add('3');
 		Automaton aut = BuilderAutomaton.buildStartAutomaton(sigma);
 		AutomatonWriter writer = new AutomatonWriter();
-		writer.writeAutomaton(aut, "/home/claudio/ejercicios/TP1-Tlen/src/test/aut.txt");
+		writer.writeAutomaton(aut, "./automatas/aut1.txt");
+		
+		Set<Character> sigma1 = new HashSet<Character>();
+		sigma1.add('1');
+		sigma1.add('2');
+		sigma1.add('5');
+		Automaton aut1 = BuilderAutomaton.buildStartAutomaton(sigma1);
+		writer.writeAutomaton(aut1, "./automatas/aut2.txt");
 	}
 
 }
