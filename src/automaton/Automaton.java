@@ -514,6 +514,38 @@ public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
 }
 
 
+public Automaton complemento(Automaton aut1){
+	aut1=completar(aut1);
+	Set<State> finales= (aut1.getStates());
+	finales.removeAll(aut1.getFinalStates());//los finales ahora son todos los estados normales, sin los finales
+	return minimize(Automaton(aut1.getSigma(), aut1.getTransitions(), aut1.getStates(), aut1.getInitialState(), finales)); //devuelvo el mínimo del complemento
+}
+
+public boolean iguales(Automaton aut1, Automaton aut2){
+
+return isEmptyintersection(aut1, complemento(aut2))); //si la intersección entre a1 y el comlemento de a2 es vacía significa que a1=a2
+}
+
+public boolean Acepta?(String s, Automaton aut1){
+State ini=aut1.getInitialState();
+State tran = ini;
+boolean aceptado=true;
+for (int i = 0, n = s.length(); i < n; i++) {
+	char c = s.charAt(i);
+	State tran =aut1.transition(ini,c);
+	if ( tran == null){//si no hay transición
+		aceptado=false;
+		break;	
+		}
+	}
+if (aceptado && ((aut1.getFinalStates()).contains(tran))){ //si tuvo todas las transiciones y llegó a un estado final
+		return aceptado;
+		}
+else{
+			return false;
+		}
+
+
 
 
 }
@@ -567,5 +599,8 @@ class Pair<X,Y> {
 		return y;
 	}
 }
+	
+
+
 
 
