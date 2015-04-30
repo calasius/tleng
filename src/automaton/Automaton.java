@@ -40,6 +40,10 @@ public class Automaton {
 		return this.sigma;
 	}
 	
+	public Map<Character, State>>  getTransitions() {
+		return this.transitions;
+	}
+	
 	public boolean isFinal(int i) {
 		return finalStates.contains(states[i]);
 	}
@@ -443,8 +447,17 @@ public Automaton estrella(Automaton aut1){
 	return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
 }
 
+public Automaton complemento(Automaton aut1){
+	
+		Set<State> finales= (aut1.getStates());
+		finales.removeAll(aut1.getFinalStates());//los finales ahora son todos los estados normales, sin los finales
+	return minimize(Automaton(aut1.getSigma(), aut1.getTransitions(), aut1.getStates(), aut1.getInitialState(), finales)); //devuelvo el mínimo del complemento
+	
+	}
 
-
+public boolean Iguales?(Automaton aut1, Automaton aut2){
+	return isEmpty(intersection(aut1, complemento(aut2))); //si la intersección entre a1 y el comlemento de a2 es vacía significa que a1=a2
+	}
 }
 
 
