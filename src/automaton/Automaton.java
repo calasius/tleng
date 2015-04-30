@@ -515,24 +515,27 @@ public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
 
 
 public Automaton complemento(Automaton aut1){
-	aut1=completar(aut1);
-	Set<State> finales= (aut1.getStates());
+	aut1.complete(aut1.getSigma());
+	Set<State> finales = new HashSet<State>(); 
+	for (State state : aut1.getStates()) {
+		finales.add(state);
+	}
 	finales.removeAll(aut1.getFinalStates());//los finales ahora son todos los estados normales, sin los finales
-	return minimize(Automaton(aut1.getSigma(), aut1.getTransitions(), aut1.getStates(), aut1.getInitialState(), finales)); //devuelvo el mínimo del complemento
+	return minimize( new Automaton(aut1.getSigma(), aut1.getTransitions(), aut1.getStates(), aut1.getInitialState(), finales)); //devuelvo el mínimo del complemento
 }
 
-public boolean iguales(Automaton aut1, Automaton aut2){
+//public boolean iguales(Automaton aut1, Automaton aut2){
+//
+//	return isEmptyintersection(aut1, complemento(aut2))); //si la intersección entre a1 y el comlemento de a2 es vacía significa que a1=a2
+//}
 
-return isEmptyintersection(aut1, complemento(aut2))); //si la intersección entre a1 y el comlemento de a2 es vacía significa que a1=a2
-}
-
-public boolean Acepta?(String s, Automaton aut1){
+public boolean acepta(String s, Automaton aut1){
 State ini=aut1.getInitialState();
 State tran = ini;
 boolean aceptado=true;
 for (int i = 0, n = s.length(); i < n; i++) {
 	char c = s.charAt(i);
-	State tran =aut1.transition(ini,c);
+	tran = aut1.transition(ini,c);
 	if ( tran == null){//si no hay transición
 		aceptado=false;
 		break;	
@@ -544,6 +547,7 @@ if (aceptado && ((aut1.getFinalStates()).contains(tran))){ //si tuvo todas las t
 else{
 			return false;
 		}
+}
 
 
 
