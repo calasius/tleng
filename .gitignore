@@ -4,4 +4,4 @@
 /automaton/
 /exceptions/
 /test/
-/*.class
+/bin/*
