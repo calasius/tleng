@@ -33,7 +33,7 @@ public class Automaton {
 		this.states = states;
 		this.initialState = initialState;
 		this.finalStates = finalStates;
-
+		this.complete(getSigma());
 	}
 
 	private boolean isComplete(Set<Character> sigma) {

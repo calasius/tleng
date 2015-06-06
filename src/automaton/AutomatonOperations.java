@@ -14,14 +14,17 @@ import java.util.Set;
 public class AutomatonOperations {
 	
 	public Automaton complemento(Automaton automaton){
-		automaton.complete(automaton.getSigma());
 		Set<State> finales = new HashSet<State>(); 
+		
 		for (State state : automaton.getStates()) {
 			finales.add(state);
 		}
+		
 		finales.removeAll(automaton.getFinalStates());
 		
-		return AutomatonOperations.minimizeAutomaton(automaton);
+		Automaton complementAutomaton = new Automaton(automaton.getSigma(), automaton.getTransitions(), automaton.getStates(), automaton.getInitialState(), finales);
+		
+		return minimizeAutomaton(complementAutomaton);
 	}
 	
 	public static Automaton minimizeAutomaton(Automaton automaton) {
