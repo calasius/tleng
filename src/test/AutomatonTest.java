@@ -6,9 +6,10 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import exceptions.NoTransitionException;
 import automaton.Automaton;
+import automaton.AutomatonOperations;
 import automaton.BuilderAutomaton;
+import exceptions.NoTransitionException;
 
 public class AutomatonTest{
 
@@ -24,7 +25,7 @@ public class AutomatonTest{
 		sigma2.add('5');
 		Automaton automaton1 = BuilderAutomaton.buildStartAutomaton(sigma1);
 		Automaton automaton2 = BuilderAutomaton.buildStartAutomaton(sigma2);
-		Automaton intersection = Automaton.intersection(automaton1, automaton2);
+		Automaton intersection = AutomatonOperations.intersection(automaton1, automaton2);
 		Assert.assertEquals(1, intersection.getStates().length);
 		Assert.assertEquals(intersection.getInitialState(), intersection.transition(intersection.getInitialState(), Character.valueOf('1')));
 		Assert.assertEquals(intersection.getInitialState(), intersection.transition(intersection.getInitialState(), Character.valueOf('2')));
@@ -43,7 +44,7 @@ public class AutomatonTest{
 		sigma2.add('6');
 		Automaton automaton1 = BuilderAutomaton.buildStartAutomaton(sigma1);
 		Automaton automaton2 = BuilderAutomaton.buildStartAutomaton(sigma2);
-		Automaton intersection = Automaton.intersection(automaton1, automaton2);
+		Automaton intersection = AutomatonOperations.intersection(automaton1, automaton2);
 		Assert.assertEquals(1, intersection.getStates().length);
 		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('1')));
 		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('2')));

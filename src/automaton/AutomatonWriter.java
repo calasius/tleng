@@ -55,5 +55,43 @@ public class AutomatonWriter {
 		}
 		return buffer.toString().trim();
 	}
+	
+	public void makeDot(String filename, Automaton automaton) {
+
+		try {
+
+			PrintWriter writer = new PrintWriter(filename, "UTF-8");
+			writer.println("strict digraph {\n rankdir=LR;\n");
+			writer.println("node [shape = none, label = \", width = 0, height = 0]; qd;");
+			writer.println("node [label=\"\\N\", width = 0.5, height = 0.5];");
+
+			// Imprimo los estados finales con doble circulo
+			writer.println("node [shape = doublecircle]; ");
+
+			for (State s : automaton.getFinalStates()) {
+				writer.println(s.getName() + ";\n"); // Imprimo cada nombre de
+														// los estados finales
+			}
+
+			writer.println("node [shape = circle];");
+
+			// Imprimo las transiciones con sus respectivos labels
+
+			for (State src : automaton.getTransitions().keySet()) {
+				for (Character symbol : automaton.getTransitions().get(src).keySet()) {
+					writer.println(src + " -> "
+							+ automaton.getTransitions().get(src).get(symbol)
+							+ "[label=\"" + symbol + "\"]");
+				}
+			}
+
+			// Cierro el archivo
+			writer.println("}");
+			writer.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 }

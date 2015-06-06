@@ -1,7 +1,7 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import automaton.Automaton;
+import automaton.AutomatonOperations;
 import automaton.AutomatonReader;
 import automaton.AutomatonWriter;
 
@@ -144,7 +144,7 @@ public class AFD {
 		AutomatonWriter writer = new AutomatonWriter();
 		Automaton automaton1 = reader.readAutomaton(aut1);
 		Automaton automaton2 = reader.readAutomaton(aut2);
-		Automaton intersection = Automaton.intersection(automaton1, automaton2);
+		Automaton intersection = AutomatonOperations.intersection(automaton1, automaton2);
 		writer.writeAutomaton(intersection, aut);
 	}
 
