@@ -340,6 +340,10 @@ public class AutomatonOperations {
 			
 		return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
 	}
+	
+	public static Automaton makeDeterministics(Automaton automaton) {
+		return null;
+	}
 
 
 }

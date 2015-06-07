@@ -62,7 +62,7 @@ public class AutomatonWriter {
 
 			PrintWriter writer = new PrintWriter(filename, "UTF-8");
 			writer.println("strict digraph {\n rankdir=LR;\n");
-			writer.println("node [shape = none, label = \", width = 0, height = 0]; qd;");
+			writer.println("node [shape = none, label = \"\", width = 0, height = 0]; qd;");
 			writer.println("node [label=\"\\N\", width = 0.5, height = 0.5];");
 
 			// Imprimo los estados finales con doble circulo
@@ -79,8 +79,8 @@ public class AutomatonWriter {
 
 			for (State src : automaton.getTransitions().keySet()) {
 				for (Character symbol : automaton.getTransitions().get(src).keySet()) {
-					writer.println(src + " -> "
-							+ automaton.getTransitions().get(src).get(symbol)
+					writer.println(src.getName() + " -> "
+							+ automaton.getTransitions().get(src).get(symbol).getName()
 							+ "[label=\"" + symbol + "\"]");
 				}
 			}

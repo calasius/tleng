@@ -1,5 +1,7 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import exceptions.InvalidAutomatonException;
 import automaton.Automaton;
 import automaton.AutomatonOperations;
 import automaton.AutomatonReader;
@@ -132,9 +134,16 @@ public class AFD {
 	}
 
 	// Ejercicio 3.c
-	private static void GenerateDOTFromDFA(String aut, String dot) throws NoSuchMethodException
+	private static void GenerateDOTFromDFA(String aut, String dot) throws NoSuchMethodException, InvalidAutomatonException
 	{
-		throw new NoSuchMethodException("Not implemented method: GenerateDOTFromDFA");
+		AutomatonReader reader = new AutomatonReader();
+		AutomatonWriter writer = new AutomatonWriter();
+		try {
+			Automaton automaton1 = reader.readAutomaton(aut);
+			writer.makeDot(dot, automaton1);
+		} catch (FileNotFoundException e) {
+			throw new InvalidAutomatonException();
+		}
 	}
 
 	// Ejercicio 3.d
