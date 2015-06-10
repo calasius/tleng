@@ -37,10 +37,11 @@ public class AutomatonOperations {
 		stateClasses.add(class1);
 		stateClasses.add(class2);
 		
-		int classesSize;
+		int classesSizeBefore = 0;
+		int classesSizeActual = stateClasses.size();
 		
-		do {
-			classesSize = stateClasses.size();
+		while (classesSizeBefore != classesSizeActual) {
+			classesSizeBefore = classesSizeActual;
 			for (Character label : automaton.getSigma()) {
 				Map<Integer,Set<State>> newPartitions = new HashMap<Integer,Set<State>>();
 				for (Set<State> stateClass : stateClasses) {
@@ -51,8 +52,9 @@ public class AutomatonOperations {
 				}
 				stateClasses.clear();
 				stateClasses.addAll(newPartitions.values());
-			}			
-		} while (classesSize < stateClasses.size());
+			}
+			classesSizeActual = stateClasses.size();
+		} 
 		
 		Map<State, Map<Character,State>> minimizedTransitions = new HashMap<State, Map<Character,State>>();
 		State[] minimizedStates = new State[stateClasses.size()];
