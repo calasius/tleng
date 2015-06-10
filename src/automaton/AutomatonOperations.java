@@ -42,23 +42,15 @@ public class AutomatonOperations {
 		do {
 			classesSize = stateClasses.size();
 			for (Character label : automaton.getSigma()) {
-				List<Set<State>> newStateClasses = new ArrayList<Set<State>>();
+				Map<Integer,Set<State>> newPartitions = new HashMap<Integer,Set<State>>();
 				for (Set<State> stateClass : stateClasses) {
-					Set<State> newStateClass = new HashSet<State>();
 					for (State state : stateClass) {
-						//if state class has only one state it can't be partitioned
-						if (!stateClass.contains(automaton.transition(state, label)) && stateClass.size() > 1) {
-							newStateClass.add(state);
-							stateClass.remove(state);
-						}
-					}
-					if (!newStateClass.isEmpty()) {
-						newStateClasses.add(newStateClass);
+						Integer stateClassNumber = stateClasses.indexOf(findStateClassOf(automaton.transition(state, label), stateClasses));
+						addState(stateClassNumber,state,newPartitions);
 					}
 				}
-				if (!newStateClasses.isEmpty()) {
-					stateClasses.addAll(newStateClasses);				
-				}
+				stateClasses.clear();
+				stateClasses.addAll(newPartitions.values());
 			}			
 		} while (classesSize < stateClasses.size());
 		
@@ -78,17 +70,13 @@ public class AutomatonOperations {
 				if (isInitialStateClass(stateClass, automaton)) {
 					minimizedInitialState = minimizedState;
 				}
-				for (State state : stateClass) {
-					Set<State> destStateClass = null;
-					if (!stateClass.contains(automaton.transition(state, label))) {
-						destStateClass = findStateClassOf(state, stateClasses);
-					} else {
-						destStateClass = stateClass;
-					}
-					classNumber = stateClasses.indexOf(destStateClass);
-					State destState = new State(String.valueOf(classNumber));
-					insertTransition(state, destState, label, minimizedTransitions);
-				}
+				
+				State memberOfClass = stateClass.iterator().next();
+				Set<State> desStateClass = findStateClassOf(automaton.transition(memberOfClass, label), stateClasses);
+				int destStateClassNumber = stateClasses.indexOf(desStateClass);
+				State fromState = new State(String.valueOf(classNumber));
+				State toState = new State(String.valueOf(destStateClassNumber));
+				insertTransition(fromState, toState, label, minimizedTransitions);
 			}
 			
 		}
@@ -96,6 +84,19 @@ public class AutomatonOperations {
 		return new Automaton(automaton.getSigma(), minimizedTransitions, minimizedStates, minimizedInitialState, minimizedFinalStates);
 	}
 	
+	private static void addState(Integer stateClassNumber, State state,
+			Map<Integer, Set<State>> newPartitions) {
+		
+		if (newPartitions.containsKey(stateClassNumber)) {
+			newPartitions.get(stateClassNumber).add(state);
+		} else {
+			Set<State> states = new HashSet<State>();
+			states.add(state);
+			newPartitions.put(stateClassNumber, states);
+		}
+		
+	}
+
 	public static Automaton intersection(Automaton aut1, Automaton aut2) {
 		
 		//Sigma automata interseccion
@@ -172,7 +173,7 @@ public class AutomatonOperations {
 
 	private static Set<State> findStateClassOf(State state, List<Set<State>> stateClasses) {
 		for (Set<State> stateClass : stateClasses) {
-			if (stateClass.contains(null)) {
+			if (stateClass.contains(state)) {
 				return stateClass;
 			}
 		}

@@ -1,5 +1,6 @@
 package test;
 
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.junit.Test;
 
 import automaton.Automaton;
 import automaton.AutomatonOperations;
+import automaton.AutomatonReader;
 import automaton.BuilderAutomaton;
 import exceptions.NoTransitionException;
 
@@ -53,5 +55,13 @@ public class AutomatonTest{
 		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('5')));
 		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('6')));
 		
+	}
+	
+	@Test
+	public void testMinimizar() throws FileNotFoundException {
+		AutomatonReader reader = new AutomatonReader();
+		Automaton automaton = reader.readAutomaton("./automatas/aut3.txt");
+		Automaton minimized = AutomatonOperations.minimizeAutomaton(automaton);
+		Assert.assertEquals(2, minimized.getStates().length);
 	}
 }

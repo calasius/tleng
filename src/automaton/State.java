@@ -37,5 +37,9 @@ public class State {
 		return true;
 	}
 	
+	public String toString() {
+		return this.name;
+	}
+	
 	
 }
