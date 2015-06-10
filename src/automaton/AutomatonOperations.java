@@ -341,11 +341,145 @@ public class AutomatonOperations {
 		return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
 	}
 	
-	public static Automaton makeDeterministics(Automaton automaton) {
-		return null;
+	private static Set<State> alcanzablesPor(Character label, Set<State> states, Automaton automaton){
+		Set<State> alcanzables = new HashSet<State>();
+		for (State state : states) {
+			Map<Character,State> stateTransitions = automaton.getTransitions().get(state);
+			if (stateTransitions != null && stateTransitions.containsKey(label)) {
+				alcanzables.add(stateTransitions.get(label));
+			}
+		}
+		return alcanzables;
+	}
+	
+	private static Set<State> alcanzablesPor(Character label, State state,
+			Automaton automaton) {
+		Set<State> states = new HashSet<State>();
+		states.add(state);
+		return alcanzablesPor(label, states, automaton);
+	}
+	
+	private static Set<State> clausuraEstado(Set<State> states, Automaton a) {
+
+		Set<State> alcanzables = alcanzablesPor(null, states, a);
+		Set<State> res = new HashSet<State>();
+		Deque<State> q = new LinkedList<State>();
+		if (!(alcanzables.isEmpty())) {
+			for (State st : alcanzables) {
+				q.addFirst(st);
+				res.add(st);
+			}
+			State temp = null;
+			while (!(q.isEmpty())) {
+				temp = q.removeFirst();
+				alcanzables = alcanzablesPor(null, temp, a);
+				if (!(alcanzables.isEmpty())) {
+					for (State st : alcanzables) {
+						q.addFirst(st);
+						res.add(st);
+					}
+				}
+			}
+		}
+		res.addAll(states);
+		return res;
+	}
+	
+	public Automaton determinizar(Automaton automaton) {
+		Set<State> inic = clausuraEstado(automaton.getInitialState(), automaton);
+		List<Set<State>> estados = new ArrayList<Set<State>>();
+		estados.add(inic);
+		Deque<Set<State>> sinMarcar = new LinkedList<Set<State>>();
+		sinMarcar.addFirst(inic);
+		Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character, State>>();
+
+		while (!(sinMarcar.isEmpty())) {
+			Set<State> temp = sinMarcar.removeFirst();
+			for (Character label : automaton.getSigma()) {
+				Set<State> newSt = new HashSet<State>();
+				for (State st : temp) {
+					// junto los estados alcanzables por cada simbolo
+					newSt.addAll(alcanzablesPor(label, st, automaton));
+				}
+
+				Set<State> clausuras = new HashSet<State>();
+
+				// newSt tiene los estados a los que puedo llegar desde cada
+				// simbolo
+				for (State st : newSt) {
+					// clausuro por lambda todos los estados
+					clausuras.addAll(clausuraEstado(st, automaton));
+				}
+
+				// si CLAUSURAS no existía como estado, lo agrego y lo pongo en
+				// la cola para clausurarlo
+				if (!estados.contains(clausuras)) {
+					estados.add(clausuras);
+					sinMarcar.addFirst(clausuras);
+				}
+
+				// registro las transiciones entre los estados del nuevo DFA (si
+				// la clausura no dio vacio)
+				if (!(clausuras.isEmpty())) {
+					State src = new State(String.valueOf(estados.indexOf(temp)));
+					// los nombres de los estados son los indices en la lista
+					State dst = new State(String.valueOf(estados
+							.indexOf(clausuras)));
+
+					if (transiciones.containsKey(src)) {
+						transiciones.get(src).put(label, dst);
+					} else {
+						Map<Character, State> newTran = new HashMap<Character, State>();
+						newTran.put(label, dst);
+						transiciones.put(src, newTran);
+					}
+				}
+			}
+		}
+
+		Set<State> estadosTotales = new HashSet<State>();
+		Set<State> estadosFinales = new HashSet<State>();
+		State estadoInicial = new State("0");
+
+		for (Set<State> sst : estados) {
+			Set<State> interceccion = interceccion(automaton.getFinalStates(), sst);
+			if (!interceccion.isEmpty()) {
+				State estado_dfa = new State(String.valueOf(estados
+						.indexOf(sst)));
+				estadosFinales.add(estado_dfa);
+				estadosTotales.add(estado_dfa);
+			} else {
+				State estado_dfa = new State(String.valueOf(estados
+						.indexOf(sst)));
+				estadosTotales.add(estado_dfa);
+			}
+		}
+		
+		return (new Automaton(automaton.getSigma(), transiciones,
+				estadosTotales.toArray(new State[0]), estadoInicial , estadosFinales));
+
 	}
 
-
+	private Set<State> clausuraEstado(State state, Automaton automaton) {
+		Set<State> states = new HashSet<State>();
+		states.add(state);
+		return clausuraEstado(states,automaton);
+	}
+	
+	private Set<State> interceccion(Set<State> set1, Set<State> set2) {
+		Set<State> interceccion = new HashSet<State>();
+		if (set2 == null) {
+			return interceccion;
+		}
+		for (State state : set2) {
+			if (set1.contains(state)) {
+				interceccion.add(state);
+			}
+		}
+		
+		return interceccion;
+	}
+	
 }
 
 
