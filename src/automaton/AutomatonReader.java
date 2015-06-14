@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +31,7 @@ public class AutomatonReader {
 		Set<State> finalStates = getFinalStates(finalStatesLine);
 		Map<State, Map<Character, State>> transitions = getTransitions(transitionsLines);
 
+		scanner.close();
 		return new Automaton(sigma, transitions, states, initialState,
 				finalStates);
 	}

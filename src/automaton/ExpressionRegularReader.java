@@ -13,10 +13,10 @@ public class ExpressionRegularReader {
 		
 		while(scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			get
+			//get
 			
 		}
-		
+		scanner.close();
 		return null;
 		
 	}
