@@ -10,6 +10,7 @@ import org.junit.Test;
 import automaton.Automaton;
 import automaton.AutomatonOperations;
 import automaton.AutomatonReader;
+import automaton.AutomatonWriter;
 import automaton.BuilderAutomaton;
 import exceptions.NoTransitionException;
 
@@ -60,18 +61,21 @@ public class AutomatonTest{
 	@Test
 	public void testMinimizar() throws FileNotFoundException {
 		AutomatonReader reader = new AutomatonReader();
-		Automaton automaton = reader.readAutomaton("./automatas/aut3.txt");
+		Automaton automaton = reader.readAutomaton("../automatas/aut3.txt");
 		Automaton minimized = AutomatonOperations.minimizeAutomaton(automaton);
 		Assert.assertEquals(2, minimized.getStates().length);
 	}
 	
-	@Test
+/*	@Test
 	public void testComplemento() throws FileNotFoundException {
 		AutomatonReader reader = new AutomatonReader();
-		Automaton automaton = reader.readAutomaton("./automatas/aut4.txt");
-		Automaton minimized = AutomatonOperations.minimizeAutomaton(automaton);
-		Assert.assertEquals(2, minimized.getStates().length);
+		Automaton automaton = reader.readAutomaton("../automatas/aut3.txt");
+		Automaton complemento = AutomatonOperations.complemento(automaton);
+		Assert.assertEquals(2, complemento.getStates().length);
+		AutomatonWriter writer = new AutomatonWriter();
+		AutomatonWriter.writeAutomaton(complemento,"../automatas/aut4.txt");
+		
 	}
-	
+	*/
 	
 }
