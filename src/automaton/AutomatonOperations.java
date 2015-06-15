@@ -205,6 +205,33 @@ public class AutomatonOperations {
 	}
 	
 	
+	private static boolean llegoAFinal(State st, int n, Automaton aut){
+		if(aut.isFinal(st)){
+			return true;
+		}
+		if(n > aut.getStates().length){
+			return false;
+		}else{
+			for(Character c: aut.getSigma()){
+				State dst = aut.transition(st, c);
+				llegoAFinal(dst, n+1, aut);
+			}
+			
+		}
+		return true;
+		
+	}
+	
+	public static boolean esVacio(Automaton aut){
+		
+		for(Character c: aut.getSigma()){
+			if(llegoAFinal(aut.transition(aut.getInitialState(),c),2,aut)){
+				return false;
+			}
+		}
+			return true;
+	}
+	
 	
 	public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
 		
@@ -216,15 +243,7 @@ public class AutomatonOperations {
 		
 		//creo el automata c = (A Int BComp) U (AComp Int B)
 		
-		
-		for( State st : aut_res.getStates()){
-				if (!aut_res.getTransitions().get(st).isEmpty()){	// si hay una transicion en el automata c, no son equivalentes
-					return false;
-				}
-		}
-		
-		return true;
-		
+		return esVacio(aut_res);
 	}
 	
 	public static Automaton unCaracter(Set<Character> sigma, Character a){
