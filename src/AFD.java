@@ -160,13 +160,53 @@ public class AFD {
 	// Ejercicio 3.e
 	private static void ComputeDFAComplement(String aut1, String aut) throws NoSuchMethodException
 	{
-		throw new NoSuchMethodException("Not implemented method: ComputeDFAComplement");
+		
+		AutomatonReader reader = new AutomatonReader();
+		AutomatonWriter writer = new AutomatonWriter();
+		Automaton automaton1 = null;
+		try {
+			automaton1 = reader.readAutomaton(aut1);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Automaton complement = AutomatonOperations.complemento(automaton1);
+		
+		try {
+			writer.writeAutomaton(complement, aut);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	// Ejercicio 3.f
 	private static void ComputeDFAEquivalence(String aut1, String aut2) throws NoSuchMethodException
 	{
-		throw new NoSuchMethodException("Not implemented method: ComputeDFAEquivalence");
-	}
+		AutomatonReader reader = new AutomatonReader();
+		AutomatonWriter writer = new AutomatonWriter();
+		Automaton automaton1 = null;
+		try {
+			automaton1 = reader.readAutomaton(aut1);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Automaton automaton2 = null;
+		try {
+			automaton2 = reader.readAutomaton(aut2);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (AutomatonOperations.areEquivalents(automaton1, automaton2)){
+			System.out.println("TRUE");
+		}else{
+			System.out.println("FALSE");
+		}
+		}
 
 }
