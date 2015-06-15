@@ -31,6 +31,7 @@ public class AutomatonReader {
 		Set<State> finalStates = getFinalStates(finalStatesLine);
 		Map<State, Map<Character, State>> transitions = getTransitions(transitionsLines);
 
+		scanner.close();
 		return new Automaton(sigma, transitions, states, initialState,
 				finalStates);
 	}

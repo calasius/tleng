@@ -64,4 +64,15 @@ public class AutomatonTest{
 		Automaton minimized = AutomatonOperations.minimizeAutomaton(automaton);
 		Assert.assertEquals(2, minimized.getStates().length);
 	}
+	
+	@Test
+	public void testComplemento() throws FileNotFoundException {
+		AutomatonReader reader = new AutomatonReader();
+		Automaton automaton = reader.readAutomaton("./automatas/aut3.txt");
+		Automaton complemento = AutomatonOperations.complemento(automaton);
+		Assert.assertEquals(2, complemento.getStates().length);
+		
+	}
+	
+	
 }

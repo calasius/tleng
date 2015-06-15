@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class AutomatonOperations {
 	
-	public Automaton complemento(Automaton automaton){
+	public static Automaton complemento(Automaton automaton){
 		Set<State> finales = new HashSet<State>(); 
 		
 		for (State state : automaton.getStates()) {
@@ -195,26 +195,36 @@ public class AutomatonOperations {
 		
 	}
 	
+	public static Automaton union(Automaton aut1, Automaton aut2){
+		
+		Automaton aut1Comp = complemento(aut1);
+		Automaton aut2Comp = complemento(aut2);
+		Automaton interComp = intersection(aut1Comp,aut2Comp);
+		
+		return complemento(interComp);
+	}
+	
+	
+	
 	public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
-
-		Set<Pair<State, State>> relation = new HashSet<Pair<State, State>>();
-
-		Deque<Pair<State, State>> todo = new LinkedList<Pair<State, State>>();
-		todo.add(new Pair<State, State>(aut1.getInitialState(), aut2
-				.getInitialState()));
-
-		while (!todo.isEmpty()) {
-			Pair<State, State> pair = todo.removeFirst();
-			if (relation.contains(pair)) {
-				continue;
-			}
-			if (aut1.isFinal(pair.getX()) != aut2.isFinal(pair.getY())) {
-				return false;
-			}
-
+		
+		Automaton aut1Comp = complemento(aut1);
+		Automaton aut2Comp = complemento(aut2);
+		Automaton aut1_int_aut2C = intersection(aut1,aut2Comp);
+		Automaton aut2_int_aut1C = intersection(aut1Comp,aut2);
+		Automaton aut_res = union(aut1_int_aut2C,aut2_int_aut1C); 
+		
+		//creo el automata c = (A Int BComp) U (AComp Int B)
+		
+		
+		for( State st : aut_res.getStates()){
+				if (!aut_res.getTransitions().get(st).isEmpty()){	// si hay una transicion en el automata c, no son equivalentes
+					return false;
+				}
 		}
-
-		return false;
+		
+		return true;
+		
 	}
 	
 	public static Automaton unCaracter(Set<Character> sigma, Character a){

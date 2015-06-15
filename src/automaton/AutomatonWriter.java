@@ -29,7 +29,7 @@ public class AutomatonWriter {
 		}
 		
 		writer.flush();
-		
+		writer.close();
 	}
 
 	private String getFinalStatesLine(Automaton automaton) {
