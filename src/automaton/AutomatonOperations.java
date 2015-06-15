@@ -217,7 +217,7 @@ public class AutomatonOperations {
 		return false;
 	}
 	
-	public Automaton unCaracter(Set<Character> sigma, Character a){
+	public static Automaton unCaracter(Set<Character> sigma, Character a){
 		State initialSt = new State("q0");
 		State finalSt = new State("q1");
 		State[] estados = new State[] {initialSt,finalSt};
@@ -228,7 +228,7 @@ public class AutomatonOperations {
 		return new Automaton(sigma,transiciones, estados, initialSt, estadosFinales);
 	}
 
-	public Automaton concat(Automaton aut1, Automaton aut2){
+	public static Automaton concat(Automaton aut1, Automaton aut2){
 		
 		Set<Character> alfabeto = new HashSet<Character>(aut1.getSigma());
 		alfabeto.addAll(aut2.getSigma());
@@ -289,9 +289,18 @@ public class AutomatonOperations {
 		
 		return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
 	}
+	
+	
+	public static Automaton concat(Automaton ... automatons) {
+		Automaton result = automatons[0];
+		for (int i = 1; i < automatons.length; i++) {
+			result = concat(result,automatons[i]);
+		}
+		return result;
+	}
 
 
-	public Automaton estrella(Automaton aut1){
+	public static Automaton estrella(Automaton aut1){
 		
 		Set<Character> alfabeto = new HashSet<Character>(aut1.getSigma());
 		
