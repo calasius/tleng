@@ -195,6 +195,14 @@ public class AutomatonOperations {
 		
 	}
 	
+	public static Automaton union(Automaton ... automatons) {
+		Automaton result = automatons[0];
+		for (int i = 1; i < automatons.length; i++) {
+			result = union(result,automatons[i]);
+		}
+		return result;
+	}
+	
 	public static Automaton union(Automaton aut1, Automaton aut2){
 		
 		Automaton aut1Comp = complemento(aut1);

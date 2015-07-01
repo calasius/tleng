@@ -93,8 +93,8 @@ public class Automaton {
 	}
 
 	public State transition(State q, Character label) {
-		if (transitions.isEmpty()) {
-			throw new NoTransitionException();
+		if (transitions.isEmpty() || !transitions.containsKey(q)) {
+			return null;
 		}
 		return transitions.get(q).get(label);
 	}
