@@ -18,7 +18,7 @@ public class Automaton {
 
 	private final Map<State, Map<Character, State>> transitions;
 
-	private final State[] states;
+	private State[] states;
 
 	private final State initialState;
 
@@ -60,6 +60,8 @@ public class Automaton {
 			Set<Character> newSigma = new HashSet<Character>();
 			newSigma.addAll(sigma);
 			newSigma.retainAll(this.getSigma());
+			
+			this.states = newStates;
 
 			for (State state : newStates) {
 				for (Character label : newSigma) {

@@ -259,6 +259,7 @@ public class AutomatonOperations {
 		State finalSt = new State("q1");
 		State[] estados = new State[] {initialSt,finalSt};
 		Set<State> estadosFinales = new HashSet<State>();
+		estadosFinales.add(finalSt);
 		
 		Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
 		insertTransition(initialSt, finalSt, a, transiciones);
