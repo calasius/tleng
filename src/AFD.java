@@ -171,7 +171,7 @@ public class AFD {
 			e.printStackTrace();
 		}
 		
-		Automaton complement = AutomatonOperations.complemento(automaton1);
+		Automaton complement = AutomatonOperations.complemento(automaton1,automaton1.getSigma());
 		
 		try {
 			writer.writeAutomaton(complement, aut);

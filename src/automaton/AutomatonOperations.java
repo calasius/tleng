@@ -13,7 +13,10 @@ import java.util.Set;
 
 public class AutomatonOperations {
 	
-	public static Automaton complemento(Automaton automaton){
+	public static Automaton complemento(Automaton automaton, Set<Character> sigma){
+		
+		automaton.complete(sigma);
+		
 		Set<State> finales = new HashSet<State>(); 
 		
 		for (State state : automaton.getStates()) {
@@ -31,11 +34,15 @@ public class AutomatonOperations {
 		
 		List<Set<State>> stateClasses = new ArrayList<Set<State>>();
 		
-		Set<State> class1 = new HashSet<State>(automaton.getFinalStates());
-		Set<State> class2 = new HashSet<State>(Arrays.asList(automaton.getStates()));
-		class2.removeAll(class1);
-		stateClasses.add(class1);
-		stateClasses.add(class2);
+		if (!automaton.getFinalStates().isEmpty()) {			
+			Set<State> class1 = new HashSet<State>(automaton.getFinalStates());
+			Set<State> class2 = new HashSet<State>(Arrays.asList(automaton.getStates()));
+			class2.removeAll(class1);
+			stateClasses.add(class1);
+			stateClasses.add(class2);
+		} else {
+			stateClasses.add(new HashSet<State>(Arrays.asList(automaton.getStates())));
+		}
 		
 		int classesSizeBefore = 0;
 		int classesSizeActual = stateClasses.size();
@@ -43,17 +50,23 @@ public class AutomatonOperations {
 		while (classesSizeBefore != classesSizeActual) {
 			classesSizeBefore = classesSizeActual;
 			for (Character label : automaton.getSigma()) {
-				Map<Integer,Set<State>> newPartitions = new HashMap<Integer,Set<State>>();
+				List<Set<State>> newClasses = new ArrayList<Set<State>>();
 				for (Set<State> stateClass : stateClasses) {
-					for (State state : stateClass) {
-						Integer stateClassNumber = stateClasses.indexOf(findStateClassOf(automaton.transition(state, label), stateClasses));
-						addState(stateClassNumber,state,newPartitions);
+					if (stateClass.size() > 1) {
+						Map<Integer,Set<State>> newPartitions = new HashMap<Integer,Set<State>>();
+						for (State state : stateClass) {
+							Integer classNumber = stateClasses.indexOf(findStateClassOf(automaton.transition(state, label), stateClasses));
+							addState(classNumber,state,newPartitions);
+						}
+						newClasses.addAll(newPartitions.values());
+					} else {
+						newClasses.add(stateClass);
 					}
 				}
-				stateClasses.clear();
-				stateClasses.addAll(newPartitions.values());
+				stateClasses = newClasses;
+				classesSizeBefore = classesSizeActual;
+				classesSizeActual = newClasses.size();
 			}
-			classesSizeActual = stateClasses.size();
 		} 
 		
 		Map<State, Map<Character,State>> minimizedTransitions = new HashMap<State, Map<Character,State>>();
@@ -74,18 +87,20 @@ public class AutomatonOperations {
 				}
 				
 				State memberOfClass = stateClass.iterator().next();
-				Set<State> desStateClass = findStateClassOf(automaton.transition(memberOfClass, label), stateClasses);
-				int destStateClassNumber = stateClasses.indexOf(desStateClass);
-				State fromState = new State(String.valueOf(classNumber));
-				State toState = new State(String.valueOf(destStateClassNumber));
-				insertTransition(fromState, toState, label, minimizedTransitions);
+				if (automaton.transition(memberOfClass, label) != null) {
+					Set<State> desStateClass = findStateClassOf(automaton.transition(memberOfClass, label), stateClasses);
+					int destStateClassNumber = stateClasses.indexOf(desStateClass);
+					State fromState = new State(String.valueOf(classNumber));
+					State toState = new State(String.valueOf(destStateClassNumber));
+					insertTransition(fromState, toState, label, minimizedTransitions);					
+				}
 			}
 			
 		}
 		
 		return new Automaton(automaton.getSigma(), minimizedTransitions, minimizedStates, minimizedInitialState, minimizedFinalStates);
 	}
-	
+
 	private static void addState(Integer stateClassNumber, State state,
 			Map<Integer, Set<State>> newPartitions) {
 		
@@ -102,8 +117,10 @@ public class AutomatonOperations {
 	public static Automaton intersection(Automaton aut1, Automaton aut2) {
 		
 		//Sigma automata interseccion
-		Set<Character> intersectionSigma = new HashSet<Character>(aut1.getSigma()); 
-		intersectionSigma.retainAll(aut2.getSigma());
+		Set<Character> intersectionSigma = setUnion(aut1.getSigma(),aut2.getSigma());
+		
+		aut1.complete(intersectionSigma);
+		aut2.complete(intersectionSigma);
 		
 		//Estado inicial automata interseccion
 		String inicial1 = aut1.getInitialState().getName();
@@ -126,7 +143,7 @@ public class AutomatonOperations {
 				String nombre2 = aut2.getStates()[j].getName();
 				aut2States.put(nombre2, j);
 				State estado = new State(nombre1 + nombre2);
-				int position = i + (longStates2 * j); 
+				int position = j + (longStates2 * i); 
 				intersectionStates[position] = estado;	
 				if (aut1.isFinal(i) && aut2.isFinal(j)) {
 					finalStates.add(estado);
@@ -140,27 +157,56 @@ public class AutomatonOperations {
 		for (int i = 0; i < aut1.getStates().length; i++){
 			for(int j=0; j< aut2.getStates().length; j++){
 				for (Character label : intersectionSigma) {
-					int position = i + (longStates2 * j); 
+					int position = j + (longStates2 * i); 
 					State source = intersectionStates[position];
 					State s1 = aut1.getStateNumber(i);
 					State s2 = aut2.getStateNumber(j);
 					State p1 = aut1.transition(s1, label);
 					State p2 = aut2.transition(s2, label);
-					if (p1 != null && p2 != null) {
-						//Si los dos estan definidos entonces genero la tansicion
-						int indx1 = aut1States.get(p1.getName());
-						int indx2 = aut2States.get(p2.getName());
-						int p = indx1 + (longStates2 * indx2); 
-						State dest = intersectionStates[p];
-						insertTransition(source, dest, label, intersectionTransitions);
-					} else {
-						//Si alguno no esta definido entonces no hay transicion
-					}
+					int indx1 = aut1States.get(p1.getName());
+					int indx2 = aut2States.get(p2.getName());
+					int p = indx2 + (longStates2 * indx1); 
+					State dest = intersectionStates[p];
+					insertTransition(source, dest, label, intersectionTransitions);
+//					if (aut1.getFinalStates().contains(p1) && aut2.getFinalStates().contains(p2)) {
+//						//Si los dos estan definidos entonces genero la tansicion
+//					} else {
+//						//Si alguno no esta definido entonces no hay transicion
+//					}
 				}
 			}
 		}
-			
-		return new Automaton(intersectionSigma, intersectionTransitions, intersectionStates, intersectionInitial, finalStates);
+		
+		Set<State> connectedCOmponent = connectedComponentOf(intersectionInitial, intersectionTransitions, new HashSet<State>());
+		finalStates = interseccion(connectedCOmponent,finalStates);
+		intersectionStates = connectedCOmponent.toArray(new State[0]);
+		Automaton intersection = new Automaton(intersectionSigma, intersectionTransitions, intersectionStates, intersectionInitial, finalStates);
+		return minimizeAutomaton(intersection);
+	}
+
+	private static Set<State> connectedComponentOf(State state,
+			Map<State, Map<Character, State>> transitions, Set<State> visited) {
+		Set<State> connectedComponent = new HashSet<State>();
+		if (visited.contains(state)) {
+			return connectedComponent;
+		} else {
+			connectedComponent.add(state);
+			visited.add(state);
+			if (transitions.containsKey(state)) {
+				for (Character label : transitions.get(state).keySet()) {
+					connectedComponent.addAll(connectedComponentOf(transitions.get(state).get(label), transitions, visited));
+				}
+			}
+			return connectedComponent;			
+		}
+	}
+
+	private static Set<Character> setUnion(Set<Character> sigma,
+			Set<Character> sigma2) {
+		Set<Character> union = new HashSet<Character>();
+		union.addAll(sigma);
+		union.addAll(sigma2);
+		return union;
 	}
 
 	private static boolean isInitialStateClass(Set<State> stateClass,
@@ -204,12 +250,14 @@ public class AutomatonOperations {
 	}
 	
 	public static Automaton union(Automaton aut1, Automaton aut2){
-		
-		Automaton aut1Comp = complemento(aut1);
-		Automaton aut2Comp = complemento(aut2);
+		Set<Character> sigma = new HashSet<Character>();
+		sigma.addAll(aut1.getSigma());
+		sigma.retainAll(aut2.getSigma());
+		Automaton aut1Comp = complemento(aut1,sigma);
+		Automaton aut2Comp = complemento(aut2,sigma);
 		Automaton interComp = intersection(aut1Comp,aut2Comp);
 		
-		return complemento(interComp);
+		return complemento(interComp,sigma);
 	}
 	
 	
@@ -231,20 +279,18 @@ public class AutomatonOperations {
 	}
 	
 	public static boolean esVacio(Automaton aut){
-		
-		for(Character c: aut.getSigma()){
-			if(llegoAFinal(aut.transition(aut.getInitialState(),c),2,aut)){
-				return false;
-			}
-		}
-			return true;
+		return aut.getTransitions().isEmpty() || aut.getFinalStates().isEmpty();
 	}
 	
 	
 	public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
 		
-		Automaton aut1Comp = complemento(aut1);
-		Automaton aut2Comp = complemento(aut2);
+		Set<Character> sigma = new HashSet<Character>();
+		sigma.addAll(aut1.getSigma());
+		sigma.retainAll(aut2.getSigma());
+		
+		Automaton aut1Comp = complemento(aut1,sigma);
+		Automaton aut2Comp = complemento(aut2,sigma);
 		Automaton aut1_int_aut2C = intersection(aut1,aut2Comp);
 		Automaton aut2_int_aut1C = intersection(aut1Comp,aut2);
 		Automaton aut_res = union(aut1_int_aut2C,aut2_int_aut1C); 
@@ -492,7 +538,7 @@ public class AutomatonOperations {
 		State estadoInicial = new State("0");
 
 		for (Set<State> sst : estados) {
-			Set<State> interceccion = interceccion(automaton.getFinalStates(), sst);
+			Set<State> interceccion = interseccion(automaton.getFinalStates(), sst);
 			if (!interceccion.isEmpty()) {
 				State estado_dfa = new State(String.valueOf(estados
 						.indexOf(sst)));
@@ -510,13 +556,13 @@ public class AutomatonOperations {
 
 	}
 
-	private Set<State> clausuraEstado(State state, Automaton automaton) {
+	private static Set<State> clausuraEstado(State state, Automaton automaton) {
 		Set<State> states = new HashSet<State>();
 		states.add(state);
 		return clausuraEstado(states,automaton);
 	}
 	
-	private Set<State> interceccion(Set<State> set1, Set<State> set2) {
+	private static Set<State> interseccion(Set<State> set1, Set<State> set2) {
 		Set<State> interceccion = new HashSet<State>();
 		if (set2 == null) {
 			return interceccion;

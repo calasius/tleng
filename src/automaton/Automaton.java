@@ -33,14 +33,14 @@ public class Automaton {
 		this.states = states;
 		this.initialState = initialState;
 		this.finalStates = finalStates;
-		this.complete(getSigma());
+//		this.complete(getSigma());
 	}
 
 	private boolean isComplete(Set<Character> sigma) {
-		Set<Character> newSigma = new HashSet<Character>();
-		newSigma.addAll(sigma);
-		newSigma.retainAll(this.getSigma());
-		for (Character label : newSigma) {
+//		Set<Character> newSigma = new HashSet<Character>();
+//		newSigma.addAll(sigma);
+//		newSigma.retainAll(this.getSigma());
+		for (Character label : sigma) {
 			for (State state : this.getStates()) {
 				if (transition(state, label) == null) {
 					return false;
@@ -57,14 +57,12 @@ public class Automaton {
 			State nullState = new State("NULL");
 			newStates[this.getStates().length] = nullState;
 
-			Set<Character> newSigma = new HashSet<Character>();
-			newSigma.addAll(sigma);
-			newSigma.retainAll(this.getSigma());
+			this.sigma.addAll(sigma);
 			
 			this.states = newStates;
 
 			for (State state : newStates) {
-				for (Character label : newSigma) {
+				for (Character label : this.sigma) {
 					if (transition(state, label) == null) {
 						insertTransition(state, nullState, label,
 								getTransitions());

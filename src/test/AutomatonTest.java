@@ -1,5 +1,9 @@
 package test;
 
+import static automaton.AutomatonOperations.esVacio;
+import static automaton.AutomatonOperations.intersection;
+import static automaton.AutomatonOperations.unCaracter;
+
 import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +15,7 @@ import automaton.Automaton;
 import automaton.AutomatonOperations;
 import automaton.AutomatonReader;
 import automaton.BuilderAutomaton;
-import exceptions.NoTransitionException;
+import automaton.State;
 
 public class AutomatonTest{
 
@@ -28,32 +32,25 @@ public class AutomatonTest{
 		Automaton automaton1 = BuilderAutomaton.buildStartAutomaton(sigma1);
 		Automaton automaton2 = BuilderAutomaton.buildStartAutomaton(sigma2);
 		Automaton intersection = AutomatonOperations.intersection(automaton1, automaton2);
-		Assert.assertEquals(1, intersection.getStates().length);
-		Assert.assertEquals(intersection.getInitialState(), intersection.transition(intersection.getInitialState(), Character.valueOf('1')));
-		Assert.assertEquals(intersection.getInitialState(), intersection.transition(intersection.getInitialState(), Character.valueOf('2')));
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('5')));
+		Assert.assertEquals(2, intersection.getStates().length);
+		Assert.assertEquals(new State("0"), intersection.transition(intersection.getInitialState(), Character.valueOf('1')));
+		Assert.assertEquals(new State("0"), intersection.transition(intersection.getInitialState(), Character.valueOf('2')));
+		Assert.assertEquals(new State("1"), intersection.transition(intersection.getInitialState(), Character.valueOf('5')));
 	}
 	
-	@Test(expected=NoTransitionException.class)
+	@Test
 	public void testEmptyIntersection() {
 		Set<Character> sigma1 = new HashSet<Character>();
-		sigma1.add('1');
-		sigma1.add('2');
-		sigma1.add('3');
+		sigma1.add('a');
+		Automaton aut1 = unCaracter(sigma1, 'a');
+		
 		Set<Character> sigma2 = new HashSet<Character>();
-		sigma2.add('4');
-		sigma2.add('5');
-		sigma2.add('6');
-		Automaton automaton1 = BuilderAutomaton.buildStartAutomaton(sigma1);
-		Automaton automaton2 = BuilderAutomaton.buildStartAutomaton(sigma2);
-		Automaton intersection = AutomatonOperations.intersection(automaton1, automaton2);
-		Assert.assertEquals(1, intersection.getStates().length);
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('1')));
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('2')));
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('3')));
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('4')));
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('5')));
-		Assert.assertNull(intersection.transition(intersection.getInitialState(), Character.valueOf('6')));
+		sigma2.add('b');
+		Automaton aut2 = unCaracter(sigma2, 'b');
+		
+		Automaton intersection = intersection(aut1, aut2);
+		
+		Assert.assertTrue(esVacio(intersection));
 		
 	}
 	
@@ -69,8 +66,27 @@ public class AutomatonTest{
 	public void testComplemento() throws FileNotFoundException {
 		AutomatonReader reader = new AutomatonReader();
 		Automaton automaton = reader.readAutomaton("./automatas/aut3.txt");
-		Automaton complemento = AutomatonOperations.complemento(automaton);
+		Automaton complemento = AutomatonOperations.complemento(automaton, automaton.getSigma());
 		Assert.assertEquals(2, complemento.getStates().length);
+		
+	}
+	
+	@Test
+	public void testComplemento2() {
+		Set<Character> sigma1 = new HashSet<Character>();
+		sigma1.add('1');
+		sigma1.add('2');
+		sigma1.add('3');
+		
+		Set<Character> sigma = new HashSet<Character>();
+		sigma.add('1');
+		sigma.add('2');
+		sigma.add('3');
+		sigma.add('5');
+		
+		Automaton automaton = BuilderAutomaton.buildStartAutomaton(sigma1);
+		automaton = AutomatonOperations.complemento(automaton, sigma);
+		Assert.assertEquals(2, automaton.getStates().length);
 		
 	}
 	
