@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Vector;
 
 public class AutomatonWriter {
 	
@@ -78,10 +79,29 @@ public class AutomatonWriter {
 			// Imprimo las transiciones con sus respectivos labels
 			writer.println("qd -> " + automaton.getInitialState().getName());
 			for (State src : automaton.getTransitions().keySet()) {
-				for (Character symbol : automaton.getTransitions().get(src).keySet()) {
+				// Agrupo todos los caracteres que van de source a destino
+				for (State destino : automaton.getStates()){
+					Vector<Character> chars = new Vector<Character>();
+					for (Character symbol : automaton.getTransitions().get(src).keySet()) {
+						if (automaton.getTransitions().get(src).get(symbol).equals(destino) ){
+							chars.add(symbol);
+						}
+					}	
+				
+					String str = new String();
+					for(Character c : chars){
+						if(c != chars.lastElement()){
+						str = str +(c.toString() + ",");
+						}else{
+							str = str + (c.toString());
+						}
+					}
+					
+					if (!str.isEmpty()){
 					writer.println(src.getName() + " -> "
-							+ automaton.getTransitions().get(src).get(symbol).getName()
-							+ "[label=\"" + symbol + "\"]");
+							+ destino.getName()
+							+ "[label=\"" + str + "\"]");
+					}
 				}
 			}
 

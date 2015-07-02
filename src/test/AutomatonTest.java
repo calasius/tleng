@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -92,8 +93,40 @@ public class AutomatonTest{
 				}
 			}
 			writer.writeAutomaton(minimized, "./automatas/autMinRes.txt");
-			writer.makeDot("./automatas/dotToMin.txt", automaton);
-			writer.makeDot("./automatas/dotMin.txt", minimized);
+			writer.makeDot("./automatas/dotToMin.dot", automaton);
+			writer.makeDot("./automatas/dotMin.dot", minimized);
+			
+			System.out.println("EL RESULTADO");
+			for (State src : minimized.getTransitions().keySet()) {
+				for (State destino : minimized.getStates()){
+					Vector<Character> chars = new Vector<Character>();
+					for (Character symbol : minimized.getTransitions().get(src).keySet()) {
+						
+						
+						if (minimized.getTransitions().get(src).get(symbol).equals(destino) ){
+							chars.add(symbol);
+							
+						}
+						
+					}	
+					
+					String str = new String();
+					for(Character c : chars){
+						if(c != chars.lastElement()){
+						str = str +(c.toString() + ",");
+						}else{
+							str = str + (c.toString());
+						}
+						}
+					
+					if (!str.isEmpty()){
+					System.out.println(src.getName() + " -> "
+							+ destino.getName()
+							+ "[label=\"" + str + "\"]");
+					}
+				}
+			}
+				
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
