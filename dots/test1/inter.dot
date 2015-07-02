@@ -1,0 +1,21 @@
+strict digraph {
+ rankdir=LR;
+
+node [shape = none, label = "", width = 0, height = 0]; qd;
+node [label="\N", width = 0.5, height = 0.5];
+node [shape = doublecircle]; 
+0;
+
+node [shape = circle];
+qd -> 4
+1 -> 0[label="a"]
+1 -> 5[label="c,s,d,o"]
+2 -> 1[label="s"]
+2 -> 5[label="a,c,d,o"]
+3 -> 2[label="a"]
+3 -> 5[label="c,s,d,o"]
+4 -> 3[label="c"]
+4 -> 5[label="a,s,d,o"]
+5 -> 5[label="a,c,s,d,o"]
+0 -> 5[label="a,c,s,d,o"]
+}

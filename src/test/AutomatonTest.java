@@ -179,5 +179,18 @@ public class AutomatonTest{
 		Assert.assertNotNull(concat);
 	}
 	
+	@Test
+	public void test1() throws FileNotFoundException {
+		AutomatonWriter writer = new AutomatonWriter();
+		AutomatonReader reader = new AutomatonReader();
+		Automaton aut1 = reader.readAutomaton("./pruebas/automatas/casa_o_casado.aut");
+		Automaton aut2 = reader.readAutomaton("./pruebas/automatas/casa.aut");
+		Automaton inter = intersection(aut1, aut2);
+		writer.makeDot("./dots/test1/casa_o_casado.dot", aut1);
+		writer.makeDot("./dots/test1/casa.dot", aut2);
+		writer.makeDot("./dots/test1/inter.dot", inter);
+		Assert.assertTrue(inter.reconoce("casa"));
+	}
+	
 	
 }

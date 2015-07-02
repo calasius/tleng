@@ -1,0 +1,18 @@
+strict digraph {
+ rankdir=LR;
+
+node [shape = none, label = "", width = 0, height = 0]; qd;
+node [label="\N", width = 0.5, height = 0.5];
+node [shape = doublecircle]; 
+q3;
+
+node [shape = circle];
+qd -> q0
+q2 -> q0[label="b"]
+q2 -> q3[label="a"]
+q3 -> q3[label="a,b"]
+q0 -> q0[label="b"]
+q0 -> q1[label="a"]
+q1 -> q0[label="b"]
+q1 -> q2[label="a"]
+}

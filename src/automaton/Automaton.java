@@ -127,10 +127,11 @@ public class Automaton {
 	}
 
 	public boolean reconoce(String str) {
+		str = str.trim();
 		State tran = initialState;
 		for (int i = 0, n = str.length(); i < n; i++) {
 			char c = str.charAt(i);
-			Map<Character, State> map = transitions.get(initialState);
+			Map<Character, State> map = transitions.get(tran);
 			tran = map.get(c);
 		}
 
