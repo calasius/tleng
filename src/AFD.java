@@ -1,12 +1,15 @@
+import static automaton.AutomatonOperations.areEquivalents;
+import static automaton.AutomatonOperations.complemento;
+import static automaton.AutomatonOperations.intersection;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import exceptions.InvalidAutomatonException;
 import automaton.Automaton;
-import automaton.AutomatonOperations;
 import automaton.AutomatonReader;
 import automaton.AutomatonWriter;
 import automaton.RegularExpressionReader;
+import exceptions.InvalidAutomatonException;
 
 public class AFD {
 
@@ -132,9 +135,15 @@ public class AFD {
 
 	// Ejercicio 3.b
 	private static void RecognizeString(String aut, String str)
-			throws NoSuchMethodException {
-		throw new NoSuchMethodException(
-				"Not implemented method: RecognizeString");
+			throws NoSuchMethodException, FileNotFoundException {
+		AutomatonReader reader = new AutomatonReader();
+		Automaton automaton = reader.readAutomaton(aut);
+		boolean recognize = automaton.reconoce(str);
+		if (recognize) {
+			System.out.println("TRUE");
+		} else {
+			System.out.println("FALSE");
+		}
 	}
 
 	// Ejercicio 3.c
@@ -157,7 +166,7 @@ public class AFD {
 		AutomatonWriter writer = new AutomatonWriter();
 		Automaton automaton1 = reader.readAutomaton(aut1);
 		Automaton automaton2 = reader.readAutomaton(aut2);
-		Automaton intersection = AutomatonOperations.intersection(automaton1,
+		Automaton intersection = intersection(automaton1,
 				automaton2);
 		writer.writeAutomaton(intersection, aut);
 	}
@@ -176,7 +185,7 @@ public class AFD {
 			e.printStackTrace();
 		}
 
-		Automaton complement = AutomatonOperations.complemento(automaton1,
+		Automaton complement = complemento(automaton1,
 				automaton1.getSigma());
 
 		try {
@@ -207,7 +216,7 @@ public class AFD {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (AutomatonOperations.areEquivalents(automaton1, automaton2)) {
+		if (areEquivalents(automaton1, automaton2)) {
 			System.out.println("TRUE");
 		} else {
 			System.out.println("FALSE");
