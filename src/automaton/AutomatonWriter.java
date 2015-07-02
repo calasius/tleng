@@ -70,8 +70,9 @@ public class AutomatonWriter {
 			writer.println("node [shape = doublecircle]; ");
 
 			for (State s : automaton.getFinalStates()) {
+				if (s.getName().length() != 0){
 				writer.println(s.getName() + ";\n"); // Imprimo cada nombre de
-														// los estados finales
+				}										// los estados finales
 			}
 
 			writer.println("node [shape = circle];");
