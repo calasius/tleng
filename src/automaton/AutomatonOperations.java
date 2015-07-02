@@ -302,9 +302,7 @@ public class AutomatonOperations {
 	
 	public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
 		
-		Set<Character> sigma = new HashSet<Character>();
-		sigma.addAll(aut1.getSigma());
-		sigma.retainAll(aut2.getSigma());
+		Set<Character> sigma = utils.<Character> union(aut1.getSigma(),aut2.getSigma());
 		
 		Automaton aut1Comp = complemento(aut1,sigma);
 		Automaton aut2Comp = complemento(aut2,sigma);

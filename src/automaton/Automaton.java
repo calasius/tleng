@@ -127,7 +127,7 @@ public class Automaton {
 	}
 
 	public boolean reconoce(String str) {
-		str = str.trim();
+//		str = str.trim();
 		State tran = initialState;
 		for (int i = 0, n = str.length(); i < n; i++) {
 			char c = str.charAt(i);

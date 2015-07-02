@@ -189,7 +189,8 @@ public class AutomatonTest{
 		writer.makeDot("./dots/test1/casa_o_casado.dot", aut1);
 		writer.makeDot("./dots/test1/casa.dot", aut2);
 		writer.makeDot("./dots/test1/inter.dot", inter);
-		Assert.assertTrue(inter.reconoce("casa"));
+		Assert.assertTrue(!inter.reconoce("casado"));
+		Assert.assertTrue(!inter.reconoce("casad"));
 	}
 	
 	@Test
@@ -203,5 +204,26 @@ public class AutomatonTest{
 		Assert.assertTrue(!aut1.reconoce("abc"));
 	}
 	
+	@Test
+	public void test3() throws FileNotFoundException {
+		AutomatonWriter writer = new AutomatonWriter();
+		AutomatonReader reader = new AutomatonReader();
+		Automaton aut1 = reader.readAutomaton("./pruebas/automatas/vacio.aut");
+		writer.makeDot("./dots/test3/vacio.dot", aut1);
+		aut1 = complemento(aut1, aut1.getSigma());
+		writer.makeDot("./dots/test3/vacio-complemento.dot", aut1);
+		Assert.assertTrue(!aut1.reconoce(" "));
+	}
+	
+	@Test
+	public void test4() throws FileNotFoundException {
+		AutomatonWriter writer = new AutomatonWriter();
+		AutomatonReader reader = new AutomatonReader();
+		Automaton aut1 = reader.readAutomaton("./pruebas/automatas/casa.aut");
+		Automaton aut2 = reader.readAutomaton("./pruebas/automatas/casa_o_casado.aut");
+		writer.makeDot("./dots/test4/casa.dot", aut1);
+		writer.makeDot("./dots/test4/casa_o_casado.dot", aut2);
+		Assert.assertTrue(!areEquivalents(aut1, aut2));
+	}
 	
 }
