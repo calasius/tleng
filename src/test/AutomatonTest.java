@@ -1,8 +1,6 @@
 package test;
 
-import static automaton.AutomatonOperations.esVacio;
-import static automaton.AutomatonOperations.intersection;
-import static automaton.AutomatonOperations.unCaracter;
+import static automaton.AutomatonOperations.*;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -63,31 +61,38 @@ public class AutomatonTest{
 	}
 	
 	@Test
-	public void testComplemento() throws FileNotFoundException {
-		AutomatonReader reader = new AutomatonReader();
-		Automaton automaton = reader.readAutomaton("./automatas/aut3.txt");
-		Automaton complemento = AutomatonOperations.complemento(automaton, automaton.getSigma());
-		Assert.assertEquals(2, complemento.getStates().length);
-		
-	}
-	
-	@Test
-	public void testComplemento2() {
+	public void testUnion() {
 		Set<Character> sigma1 = new HashSet<Character>();
-		sigma1.add('1');
-		sigma1.add('2');
-		sigma1.add('3');
+		sigma1.add('a');
+		Automaton aut1 = unCaracter(sigma1, 'a');
 		
-		Set<Character> sigma = new HashSet<Character>();
-		sigma.add('1');
-		sigma.add('2');
-		sigma.add('3');
-		sigma.add('5');
+		Set<Character> sigma2 = new HashSet<Character>();
+		sigma2.add('b');
+		Automaton aut2 = unCaracter(sigma2, 'b');
 		
-		Automaton automaton = BuilderAutomaton.buildStartAutomaton(sigma1);
-		automaton = AutomatonOperations.complemento(automaton, sigma);
-		Assert.assertEquals(2, automaton.getStates().length);
+		Automaton union = union(aut1, aut2);
 		
+		Assert.assertEquals(3, union.getStates().length);
+		Assert.assertEquals(new State("1"), union.getInitialState());
+		Assert.assertEquals(new State("0"), union.getTransitions().get(new State("1")).get('a'));
+		Assert.assertEquals(new State("0"), union.getTransitions().get(new State("1")).get('b'));
+		Assert.assertEquals(new State("2"), union.getTransitions().get(new State("0")).get('a'));
+		Assert.assertEquals(new State("2"), union.getTransitions().get(new State("0")).get('b'));
+		Assert.assertTrue(union.getFinalStates().size() == 1 && union.getFinalStates().contains(new State("0")));
+	}
+	 
+	@Test
+	public void testConcat() {
+		Set<Character> sigma1 = new HashSet<Character>();
+		sigma1.add('a');
+		Automaton aut1 = unCaracter(sigma1, 'a');
+		
+		Set<Character> sigma2 = new HashSet<Character>();
+		sigma2.add('b');
+		Automaton aut2 = unCaracter(sigma2, 'b');
+		
+		Automaton concat = concat(aut1, aut2);
+		Assert.assertNotNull(concat);
 	}
 	
 	

@@ -54,7 +54,7 @@ public class Automaton {
 		if (!isComplete(sigma)) {
 			State[] newStates = Arrays.copyOf(this.getStates(),
 					this.getStates().length + 1);
-			State nullState = new State("NULL");
+			State nullState = new State("T");
 			newStates[this.getStates().length] = nullState;
 
 			this.sigma.addAll(sigma);

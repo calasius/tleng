@@ -11,8 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import utils.utils;
+
 public class AutomatonOperations {
 	
+	private static final char LAMBDA = '_';
+
 	public static Automaton complemento(Automaton automaton, Set<Character> sigma){
 		
 		automaton.complete(sigma);
@@ -117,7 +121,7 @@ public class AutomatonOperations {
 	public static Automaton intersection(Automaton aut1, Automaton aut2) {
 		
 		//Sigma automata interseccion
-		Set<Character> intersectionSigma = setUnion(aut1.getSigma(),aut2.getSigma());
+		Set<Character> intersectionSigma = utils.<Character> union(aut1.getSigma(),aut2.getSigma());
 		
 		aut1.complete(intersectionSigma);
 		aut2.complete(intersectionSigma);
@@ -168,17 +172,12 @@ public class AutomatonOperations {
 					int p = indx2 + (longStates2 * indx1); 
 					State dest = intersectionStates[p];
 					insertTransition(source, dest, label, intersectionTransitions);
-//					if (aut1.getFinalStates().contains(p1) && aut2.getFinalStates().contains(p2)) {
-//						//Si los dos estan definidos entonces genero la tansicion
-//					} else {
-//						//Si alguno no esta definido entonces no hay transicion
-//					}
 				}
 			}
 		}
 		
 		Set<State> connectedCOmponent = connectedComponentOf(intersectionInitial, intersectionTransitions, new HashSet<State>());
-		finalStates = interseccion(connectedCOmponent,finalStates);
+		finalStates = utils.<State> intersection(connectedCOmponent,finalStates);
 		intersectionStates = connectedCOmponent.toArray(new State[0]);
 		Automaton intersection = new Automaton(intersectionSigma, intersectionTransitions, intersectionStates, intersectionInitial, finalStates);
 		return minimizeAutomaton(intersection);
@@ -199,14 +198,6 @@ public class AutomatonOperations {
 			}
 			return connectedComponent;			
 		}
-	}
-
-	private static Set<Character> setUnion(Set<Character> sigma,
-			Set<Character> sigma2) {
-		Set<Character> union = new HashSet<Character>();
-		union.addAll(sigma);
-		union.addAll(sigma2);
-		return union;
 	}
 
 	private static boolean isInitialStateClass(Set<State> stateClass,
@@ -250,32 +241,12 @@ public class AutomatonOperations {
 	}
 	
 	public static Automaton union(Automaton aut1, Automaton aut2){
-		Set<Character> sigma = new HashSet<Character>();
-		sigma.addAll(aut1.getSigma());
-		sigma.retainAll(aut2.getSigma());
+		Set<Character> sigma = utils.<Character> union(aut1.getSigma(), aut2.getSigma());
 		Automaton aut1Comp = complemento(aut1,sigma);
 		Automaton aut2Comp = complemento(aut2,sigma);
 		Automaton interComp = intersection(aut1Comp,aut2Comp);
 		
 		return complemento(interComp,sigma);
-	}
-	
-	
-	private static boolean llegoAFinal(State st, int n, Automaton aut){
-		if(aut.isFinal(st)){
-			return true;
-		}
-		if(n > aut.getStates().length){
-			return false;
-		}else{
-			for(Character c: aut.getSigma()){
-				State dst = aut.transition(st, c);
-				llegoAFinal(dst, n+1, aut);
-			}
-			
-		}
-		return true;
-		
 	}
 	
 	public static boolean esVacio(Automaton aut){
@@ -311,67 +282,65 @@ public class AutomatonOperations {
 		insertTransition(initialSt, finalSt, a, transiciones);
 		return new Automaton(sigma,transiciones, estados, initialSt, estadosFinales);
 	}
+	
+	private static State withPrefix(String prefix, State state) {
+		return new State(prefix+state.getName());
+	}
 
 	public static Automaton concat(Automaton aut1, Automaton aut2){
 		
-		Set<Character> alfabeto = new HashSet<Character>(aut1.getSigma());
-		alfabeto.addAll(aut2.getSigma());
+		//Sigma concat
+		Set<Character> alfabeto = utils.<Character> union(aut1.getSigma(),aut2.getSigma());
 		
-		State initialSt = new State("q0");
-		State finalSt = new State("q1");
-		State[] estados = new State[aut1.getStates().length + aut2.getStates().length + 2];
-		estados[0] = initialSt;
-		for (int i = 0 ; i < aut1.getStates().length; i++) {
-			estados[i+1] = aut1.getStates()[i];
+		aut1.complete(alfabeto);
+		aut2.complete(alfabeto);
+		
+		//States concat
+		State[] concatStates = new State[aut1.getStates().length+aut2.getStates().length];
+		for (int i = 0; i < aut1.getStates().length; i++) {
+			concatStates[i] = withPrefix("1",aut1.getStates()[i]);
+		}
+		for(int i = 0; i < aut2.getStates().length; i++) {
+			concatStates[i+aut1.getStates().length] = withPrefix("2",aut2.getStates()[i]);
 		}
 		
-		for (int i = 0 ; i < aut2.getStates().length; i++) {
-			estados[aut1.getStates().length+i+2] = aut2.getStates()[i];
-		}
+		//Initial state concat
+		State initialConcat = withPrefix("1",aut1.getInitialState());
 		
-		estados[aut1.getStates().length + aut2.getStates().length + 1] = finalSt;
-		
-		Set<State> estadosFinales = new HashSet<State>();
-		estadosFinales.add(finalSt);
-		
-		Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
-		
-		//Agrego las transiciones del nuevo estado inicial al estado inicial de cada automata
-		insertTransition(initialSt, aut1.getInitialState(), null, transiciones);
-		insertTransition(initialSt, aut2.getInitialState(), null, transiciones);
+		//Concat transitions
+		Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();		
 		
 		// Agrego todas las transiciones del automata 1
 		for (State src : aut1.getStates()) {
 			for (Character c : aut1.getSigma()) {
 				State dst = aut1.transition(src, c);
-				insertTransition(src, dst, c, transiciones);
+				insertTransition(withPrefix("1", src), withPrefix("1",dst), c, transiciones);
 			}
 		}
 
 		// Agrego todas las transiciones del automata 2
 		for (State src : aut2.getStates()) {
-			for (Character c : aut1.getSigma()) {
-				State dst = aut1.transition(src, c);
-				insertTransition(src, dst, c, transiciones);
+			for (Character c : aut2.getSigma()) {
+				State dst = aut2.transition(src, c);
+				insertTransition(withPrefix("2", src), withPrefix("2",dst), c, transiciones);
 			}
 		}
-		
 
-		//Agrego las transiciones desde cada estado final al nuevo estado final
-		for(Iterator<State> iterator = aut1.getFinalStates().iterator(); iterator.hasNext();) {
-			State src = (State) iterator.next();
-			insertTransition(src, finalSt, null, transiciones);	
+		//Agrego transiciones lambda de los finales de aut1 al inicial de aut2
+		State initial2 = aut2.getInitialState();
+		for (State state : aut1.getFinalStates()) {
+			insertTransition(withPrefix("1", state), withPrefix("2", initial2), LAMBDA, transiciones);
 		}
 		
-
-		//Agrego las transiciones desde cada estado final al nuevo estado final
-		for (Iterator<State> iterator = aut2.getFinalStates().iterator(); iterator.hasNext();) {
-			State src = (State) iterator.next();
-			insertTransition(src, finalSt, null, transiciones);
+		//Concat final states
+		Set<State> finalStates = new HashSet<State>();
+		for (State state : aut2.getFinalStates()) {
+			finalStates.add(withPrefix("2", state));			
 		}
 		
 		
-		return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
+		Automaton concat = new Automaton(alfabeto,transiciones, concatStates, initialConcat, finalStates);
+		return determinizar(concat);
 	}
 	
 	
@@ -457,7 +426,7 @@ public class AutomatonOperations {
 	
 	private static Set<State> clausuraEstado(Set<State> states, Automaton a) {
 
-		Set<State> alcanzables = alcanzablesPor(null, states, a);
+		Set<State> alcanzables = alcanzablesPor(LAMBDA, states, a);
 		Set<State> res = new HashSet<State>();
 		Deque<State> q = new LinkedList<State>();
 		if (!(alcanzables.isEmpty())) {
@@ -468,7 +437,7 @@ public class AutomatonOperations {
 			State temp = null;
 			while (!(q.isEmpty())) {
 				temp = q.removeFirst();
-				alcanzables = alcanzablesPor(null, temp, a);
+				alcanzables = alcanzablesPor(LAMBDA, temp, a);
 				if (!(alcanzables.isEmpty())) {
 					for (State st : alcanzables) {
 						q.addFirst(st);
@@ -481,7 +450,7 @@ public class AutomatonOperations {
 		return res;
 	}
 	
-	public Automaton determinizar(Automaton automaton) {
+	public static Automaton determinizar(Automaton automaton) {
 		Set<State> inic = clausuraEstado(automaton.getInitialState(), automaton);
 		List<Set<State>> estados = new ArrayList<Set<State>>();
 		estados.add(inic);
@@ -492,43 +461,24 @@ public class AutomatonOperations {
 		while (!(sinMarcar.isEmpty())) {
 			Set<State> temp = sinMarcar.removeFirst();
 			for (Character label : automaton.getSigma()) {
-				Set<State> newSt = new HashSet<State>();
-				for (State st : temp) {
-					// junto los estados alcanzables por cada simbolo
-					newSt.addAll(alcanzablesPor(label, st, automaton));
-				}
 
-				Set<State> clausuras = new HashSet<State>();
-
-				// newSt tiene los estados a los que puedo llegar desde cada
-				// simbolo
-				for (State st : newSt) {
-					// clausuro por lambda todos los estados
-					clausuras.addAll(clausuraEstado(st, automaton));
-				}
-
-				// si CLAUSURAS no existía como estado, lo agrego y lo pongo en
-				// la cola para clausurarlo
-				if (!estados.contains(clausuras)) {
-					estados.add(clausuras);
-					sinMarcar.addFirst(clausuras);
+				Set<State> newSt = alcanzablesPor(label, temp, automaton);
+				Set<State> clausura = clausuraEstado(newSt, automaton);
+				
+				if (!estados.contains(clausura)) {
+					estados.add(clausura);
+					sinMarcar.addFirst(clausura);
 				}
 
 				// registro las transiciones entre los estados del nuevo DFA (si
 				// la clausura no dio vacio)
-				if (!(clausuras.isEmpty())) {
+				if (!(clausura.isEmpty())) {
 					State src = new State(String.valueOf(estados.indexOf(temp)));
 					// los nombres de los estados son los indices en la lista
 					State dst = new State(String.valueOf(estados
-							.indexOf(clausuras)));
-
-					if (transiciones.containsKey(src)) {
-						transiciones.get(src).put(label, dst);
-					} else {
-						Map<Character, State> newTran = new HashMap<Character, State>();
-						newTran.put(label, dst);
-						transiciones.put(src, newTran);
-					}
+							.indexOf(clausura)));
+					
+					insertTransition(src, dst, label, transiciones);
 				}
 			}
 		}
@@ -538,7 +488,7 @@ public class AutomatonOperations {
 		State estadoInicial = new State("0");
 
 		for (Set<State> sst : estados) {
-			Set<State> interceccion = interseccion(automaton.getFinalStates(), sst);
+			Set<State> interceccion = utils.<State> intersection(automaton.getFinalStates(), sst);
 			if (!interceccion.isEmpty()) {
 				State estado_dfa = new State(String.valueOf(estados
 						.indexOf(sst)));
@@ -551,8 +501,10 @@ public class AutomatonOperations {
 			}
 		}
 		
-		return (new Automaton(automaton.getSigma(), transiciones,
+		Automaton deterministic =  (new Automaton(automaton.getSigma(), transiciones,
 				estadosTotales.toArray(new State[0]), estadoInicial , estadosFinales));
+		
+		return minimizeAutomaton(deterministic);
 
 	}
 
@@ -560,20 +512,6 @@ public class AutomatonOperations {
 		Set<State> states = new HashSet<State>();
 		states.add(state);
 		return clausuraEstado(states,automaton);
-	}
-	
-	private static Set<State> interseccion(Set<State> set1, Set<State> set2) {
-		Set<State> interceccion = new HashSet<State>();
-		if (set2 == null) {
-			return interceccion;
-		}
-		for (State state : set2) {
-			if (set1.contains(state)) {
-				interceccion.add(state);
-			}
-		}
-		
-		return interceccion;
 	}
 	
 }
