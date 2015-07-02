@@ -132,6 +132,9 @@ public class Automaton {
 		for (int i = 0, n = str.length(); i < n; i++) {
 			char c = str.charAt(i);
 			Map<Character, State> map = transitions.get(tran);
+			if (map == null) {
+				return false;
+			}
 			tran = map.get(c);
 		}
 

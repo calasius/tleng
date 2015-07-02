@@ -138,6 +138,7 @@ public class AFD {
 			throws NoSuchMethodException, FileNotFoundException {
 		AutomatonReader reader = new AutomatonReader();
 		Automaton automaton = reader.readAutomaton(aut);
+		automaton.complete(automaton.getSigma());
 		boolean recognize = automaton.reconoce(str);
 		if (recognize) {
 			System.out.println("TRUE");

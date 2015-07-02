@@ -192,5 +192,16 @@ public class AutomatonTest{
 		Assert.assertTrue(inter.reconoce("casa"));
 	}
 	
+	@Test
+	public void test2() throws FileNotFoundException {
+		AutomatonWriter writer = new AutomatonWriter();
+		AutomatonReader reader = new AutomatonReader();
+		Automaton aut1 = reader.readAutomaton("./pruebas/automatas/un_simbolo.aut");
+		aut1.complete(aut1.getSigma());
+		writer.makeDot("./dots/test2/un_simbolo.dot", aut1);
+		Assert.assertTrue(!aut1.reconoce("aa"));
+		Assert.assertTrue(!aut1.reconoce("abc"));
+	}
+	
 	
 }
