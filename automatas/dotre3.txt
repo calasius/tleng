@@ -4,21 +4,23 @@ strict digraph {
 node [shape = none, label = "", width = 0, height = 0]; qd;
 node [label="\N", width = 0.5, height = 0.5];
 node [shape = doublecircle]; 
+1;
+
 0;
 
 node [shape = circle];
-qd -> 3
-1 -> 0[label="b"]
-1 -> 1[label="a"]
-1 -> 5[label="c"]
-2 -> 0[label="c"]
-2 -> 5[label="a,b"]
-3 -> 1[label="b"]
-3 -> 3[label="a"]
-3 -> 5[label="c"]
-4 -> 2[label="c"]
+qd -> 0
+1 -> 4[label="c"]
+1 -> 5[label="a,b"]
+2 -> 1[label="b"]
+2 -> 2[label="a"]
+2 -> 5[label="c"]
+3 -> 1[label="c"]
+3 -> 5[label="a,b"]
+4 -> 3[label="c"]
 4 -> 5[label="a,b"]
 5 -> 5[label="a,b,c"]
+0 -> 0[label="a"]
+0 -> 2[label="b"]
 0 -> 4[label="c"]
-0 -> 5[label="a,b"]
 }

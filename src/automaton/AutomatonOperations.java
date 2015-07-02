@@ -293,7 +293,7 @@ public class AutomatonOperations {
 		Set<State> finalStates = new HashSet<State>();
 		finalStates.add(finalState);
 		
-		Automaton opt =  new Automaton(automaton.getSigma(),transiciones, states, automaton.getInitialState(), finalStates);
+		Automaton opt =  new Automaton(automaton.getSigma(),transiciones, states, initialState, finalStates);
 		return determinizar(opt);
 		
 		
