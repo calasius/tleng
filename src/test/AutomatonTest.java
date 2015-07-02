@@ -101,7 +101,7 @@ public class AutomatonTest{
 
 	}
 	
-	@Test
+//	@Test
 	public void testEstrella() throws FileNotFoundException {
 		AutomatonReader reader = new AutomatonReader();
 		Automaton automaton = reader.readAutomaton("./automatas/autToMin.txt");

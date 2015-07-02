@@ -9,6 +9,7 @@ node [shape = doublecircle];
 5;
 
 node [shape = circle];
+qd -> 1
 1 -> 3[label="a"]
 1 -> 2[label="b"]
 2 -> 4[label="a"]
