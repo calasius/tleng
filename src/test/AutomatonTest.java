@@ -3,6 +3,7 @@ package test;
 import static automaton.AutomatonOperations.*;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import org.junit.Test;
 import automaton.Automaton;
 import automaton.AutomatonOperations;
 import automaton.AutomatonReader;
+import automaton.AutomatonWriter;
 import automaton.BuilderAutomaton;
 import automaton.State;
 
@@ -58,7 +60,68 @@ public class AutomatonTest{
 		Automaton automaton = reader.readAutomaton("./automatas/aut3.txt");
 		Automaton minimized = AutomatonOperations.minimizeAutomaton(automaton);
 		Assert.assertEquals(2, minimized.getStates().length);
+		Assert.assertEquals(1, minimized.getFinalStates().size());
+		AutomatonWriter writer = new AutomatonWriter();
+		try {
+			writer.writeAutomaton(minimized, "./automatas/aut7.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
+
+	@Test
+	public void testMinimizarComplejo() throws FileNotFoundException {
+		AutomatonReader reader = new AutomatonReader();
+		Automaton automaton = reader.readAutomaton("./automatas/autToMin.txt");
+		Automaton minimized = AutomatonOperations.minimizeAutomaton(automaton);
+		//Assert.assertEquals(9, automaton.getTransitions().size());
+		//String dotMin = null;
+		//Assert.assertEquals(3, minimized.getStates().length);
+		//Assert.assertEquals(1, minimized.getFinalStates().size());
+		AutomatonWriter writer = new AutomatonWriter();
+		try {
+			System.out.println("hay " + automaton.getTransitions().size() + " transiciones");
+
+			for (State src : automaton.getTransitions().keySet()) {
+				for (Character symbol : automaton.getTransitions().get(src).keySet()) {
+					System.out.println(src.getName() + " -> "
+							+ automaton.getTransitions().get(src).get(symbol).getName()
+							+ "[label=\"" + symbol + "\"]");
+				}
+			}
+			writer.writeAutomaton(minimized, "./automatas/autMinRes.txt");
+			writer.makeDot("./automatas/dotToMin.txt", automaton);
+			writer.makeDot("./automatas/dotMin.txt", minimized);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	@Test
+	public void testEstrella() throws FileNotFoundException {
+		AutomatonReader reader = new AutomatonReader();
+		Automaton automaton = reader.readAutomaton("./automatas/autToMin.txt");
+		Automaton star = AutomatonOperations.estrella(automaton);
+		AutomatonWriter writer = new AutomatonWriter();
+		System.out.println("Test estrella");
+		for (State src : automaton.getTransitions().keySet()) {
+			for (Character symbol : automaton.getTransitions().get(src).keySet()) {
+				System.out.println(src.getName() + " -> "
+						+ automaton.getTransitions().get(src).get(symbol).getName()
+						+ "[label=\"" + symbol + "\"]");
+			}
+		}
+		//writer.writeAutomaton(minimized, "./automatas/autMinRes.txt");
+		writer.makeDot("./automatas/dotToStar.txt", automaton);
+		writer.makeDot("./automatas/dotStar.txt", star);
+
+	}
+	
+	
 	
 	@Test
 	public void testUnion() {
