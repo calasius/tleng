@@ -256,6 +256,49 @@ public class AutomatonOperations {
 		return aut.getTransitions().isEmpty() || aut.getFinalStates().isEmpty();
 	}
 	
+	public static Automaton opt(Automaton automaton) {
+		//Estados opcional
+		
+		int size = automaton.getStates().length+2;
+		State[] states = new State[size];
+		for (int i = 0; i < size-2; i++) {
+			states[i] = automaton.getStates()[i];
+		}
+		
+		State initialState = new State(String.valueOf(size-2)); 
+		states[size-2] = initialState;
+		
+		State finalState = new State(String.valueOf(size-1));
+		states[size-1] = finalState;
+		
+		
+		//Transiciones
+		Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character, State>>();
+		// Agrego todas las transiciones del automata
+		for (State src : automaton.getStates()) {
+			for (Character c : automaton.getSigma()) {
+				State dst = automaton.transition(src, c);
+				insertTransition(src, dst, c, transiciones);
+			}
+		}
+		
+		insertTransition(initialState, automaton.getInitialState(), LAMBDA, transiciones);
+		insertTransition(initialState, finalState, LAMBDA1, transiciones);
+		
+		for (State state : automaton.getFinalStates()) {
+			insertTransition(state, finalState, LAMBDA, transiciones);
+		}
+		
+		//Estados finales
+		Set<State> finalStates = new HashSet<State>();
+		finalStates.add(finalState);
+		
+		Automaton opt =  new Automaton(automaton.getSigma(),transiciones, states, automaton.getInitialState(), finalStates);
+		return determinizar(opt);
+		
+		
+	}
+	
 	
 	public static boolean areEquivalents(Automaton aut1, Automaton aut2) {
 		
@@ -420,13 +463,6 @@ public class AutomatonOperations {
 			}
 		}
 		return alcanzables;
-	}
-	
-	private static Set<State> alcanzablesPor(Character label, State state,
-			Automaton automaton) {
-		Set<State> states = new HashSet<State>();
-		states.add(state);
-		return alcanzablesPor(label, states, automaton);
 	}
 	
 	private static Set<State> clausuraEstado(Set<State> states, Automaton a) {

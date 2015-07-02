@@ -4,6 +4,7 @@ import static automaton.AutomatonOperations.concat;
 import static automaton.AutomatonOperations.estrella;
 import static automaton.AutomatonOperations.unCaracter;
 import static automaton.AutomatonOperations.union;
+import static automaton.AutomatonOperations.opt;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -50,6 +51,7 @@ public class RegularExpressionReader {
 				automaton = concat(operands[0], estrella(operands[0]));
 				break;
 			case OPT:
+				automaton = opt(operands[0]);
 				break;
 			case OR:
 				automaton = union(operands);

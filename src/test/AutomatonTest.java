@@ -144,9 +144,6 @@ public class AutomatonTest{
 		writer.makeDot("./automatas/dotToStar.txt", automaton);
 		writer.makeDot("./automatas/dotStar.txt", star);
 	}
-	
-	
-	
 	@Test
 	public void testUnion() {
 		Set<Character> sigma1 = new HashSet<Character>();
