@@ -12,7 +12,7 @@ public class RegularExpressionReaderTest {
 	@Test
 	public void test() throws FileNotFoundException {
 		RegularExpressionReader reader = new RegularExpressionReader();
-		Automaton automaton = reader.readRegularExpression("./automatas/RE1.txt");
+		Automaton automaton = reader.readRegularExpression("./automatas/re2.txt");
 		System.out.println(automaton);
 	}
 

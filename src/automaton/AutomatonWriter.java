@@ -76,7 +76,7 @@ public class AutomatonWriter {
 			writer.println("node [shape = circle];");
 
 			// Imprimo las transiciones con sus respectivos labels
-
+			writer.println("qd -> " + automaton.getInitialState().getName());
 			for (State src : automaton.getTransitions().keySet()) {
 				for (Character symbol : automaton.getTransitions().get(src).keySet()) {
 					writer.println(src.getName() + " -> "

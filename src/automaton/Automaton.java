@@ -14,6 +14,8 @@ import exceptions.NoTransitionException;
  */
 public class Automaton {
 
+	private static final String TRAP_STATE = "T";
+
 	private final Set<Character> sigma;
 
 	private final Map<State, Map<Character, State>> transitions;
@@ -54,7 +56,7 @@ public class Automaton {
 		if (!isComplete(sigma)) {
 			State[] newStates = Arrays.copyOf(this.getStates(),
 					this.getStates().length + 1);
-			State nullState = new State("T");
+			State nullState = new State(TRAP_STATE);
 			newStates[this.getStates().length] = nullState;
 
 			this.sigma.addAll(sigma);

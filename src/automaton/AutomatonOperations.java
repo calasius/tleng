@@ -68,7 +68,6 @@ public class AutomatonOperations {
 					}
 				}
 				stateClasses = newClasses;
-				classesSizeBefore = classesSizeActual;
 				classesSizeActual = newClasses.size();
 			}
 		} 
