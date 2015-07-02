@@ -16,6 +16,8 @@ import utils.utils;
 public class AutomatonOperations {
 	
 	private static final char LAMBDA = '_';
+	
+	private static final char LAMBDA1 = '*';
 
 	public static Automaton complemento(Automaton automaton, Set<Character> sigma){
 		
@@ -43,7 +45,9 @@ public class AutomatonOperations {
 			Set<State> class2 = new HashSet<State>(Arrays.asList(automaton.getStates()));
 			class2.removeAll(class1);
 			stateClasses.add(class1);
-			stateClasses.add(class2);
+			if (!class2.isEmpty()) {
+				stateClasses.add(class2);				
+			}
 		} else {
 			stateClasses.add(new HashSet<State>(Arrays.asList(automaton.getStates())));
 		}
@@ -355,16 +359,17 @@ public class AutomatonOperations {
 	public static Automaton estrella(Automaton aut1){
 		
 		Set<Character> alfabeto = new HashSet<Character>(aut1.getSigma());
-		
-		State initialSt = new State("q0");
-		State finalSt = new State("q1");
-		State[] estados = new State[aut1.getStates().length +  2];
+		aut1.complete(alfabeto);
+		int lastIndex = aut1.getStates().length +  2;
+		State initialSt = new State(String.valueOf(lastIndex-2));
+		State finalSt = new State(String.valueOf(lastIndex-1));
+		State[] estados = new State[lastIndex];
 		estados[0] = initialSt;
 		for (int i = 0 ; i < aut1.getStates().length; i++) {
-			estados[i+1] = aut1.getStates()[i];
+			estados[i] = aut1.getStates()[i];
 		}
 
-		
+		estados[aut1.getStates().length] = initialSt;
 		estados[aut1.getStates().length + 1] = finalSt;
 
 		Set<State> estadosFinales = new HashSet<State>();
@@ -374,11 +379,11 @@ public class AutomatonOperations {
 		Map<State, Map<Character, State>> transiciones = new HashMap<State, Map<Character,State>>();
 
 		//Agrego la transicion lambda del nuevo estado inicial al nuevo estado final
-		insertTransition(initialSt, finalSt, null, transiciones);
+		insertTransition(initialSt, finalSt, LAMBDA, transiciones);
 
 		
 		//Agrego las transiciones del nuevo estado inicial al estado inicial de cada automata
-		insertTransition(initialSt, aut1.getInitialState(), null, transiciones);
+		insertTransition(initialSt, aut1.getInitialState(), LAMBDA1, transiciones);
 		
 		// Agrego todas las transiciones del automata 1
 		for (State src : aut1.getStates()) {
@@ -391,18 +396,19 @@ public class AutomatonOperations {
 		//Agrego las transiciones desde cada estado final al nuevo estado final
 			for(Iterator<State> iterator = aut1.getFinalStates().iterator(); iterator.hasNext();) {
 				State src = (State) iterator.next();
-				insertTransition(src, finalSt, null, transiciones);	
+				insertTransition(src, finalSt, LAMBDA, transiciones);	
 			}
 		
 
 			//Agrego las transiciones desde cada estado final al estado inicial original del automata
 				for(Iterator<State> iterator = aut1.getFinalStates().iterator(); iterator.hasNext();) {
 					State src = (State) iterator.next();
-					insertTransition(src, aut1.getInitialState(), null, transiciones);	
+					insertTransition(src, aut1.getInitialState(), LAMBDA1, transiciones);	
 				}
 				
 			
-		return new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
+		Automaton estrella =  new Automaton(alfabeto,transiciones, estados, initialSt, estadosFinales);
+		return determinizar(estrella);
 	}
 	
 	private static Set<State> alcanzablesPor(Character label, Set<State> states, Automaton automaton){
@@ -425,7 +431,7 @@ public class AutomatonOperations {
 	
 	private static Set<State> clausuraEstado(Set<State> states, Automaton a) {
 
-		Set<State> alcanzables = alcanzablesPor(LAMBDA, states, a);
+		Set<State> alcanzables = alcanzablesPorLambda(states, a);
 		Set<State> res = new HashSet<State>();
 		Deque<State> q = new LinkedList<State>();
 		if (!(alcanzables.isEmpty())) {
@@ -436,7 +442,7 @@ public class AutomatonOperations {
 			State temp = null;
 			while (!(q.isEmpty())) {
 				temp = q.removeFirst();
-				alcanzables = alcanzablesPor(LAMBDA, temp, a);
+				alcanzables = alcanzablesPorLambda(temp, a);
 				if (!(alcanzables.isEmpty())) {
 					for (State st : alcanzables) {
 						q.addFirst(st);
@@ -448,6 +454,18 @@ public class AutomatonOperations {
 		res.addAll(states);
 		return res;
 	}
+	
+	private static Set<State> alcanzablesPorLambda(Set<State> states, Automaton automaton) {
+		Set<State> alcanzables = alcanzablesPor(LAMBDA, states, automaton);
+		alcanzables.addAll(alcanzablesPor(LAMBDA1, states, automaton));
+		return alcanzables;
+	}
+	private static Set<State> alcanzablesPorLambda(State state, Automaton automaton) {
+		Set<State> states = new HashSet<State>();
+		states.add(state);
+		return alcanzablesPorLambda(states, automaton);
+	}
+	
 	
 	public static Automaton determinizar(Automaton automaton) {
 		Set<State> inic = clausuraEstado(automaton.getInitialState(), automaton);

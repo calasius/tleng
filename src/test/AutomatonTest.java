@@ -101,24 +101,15 @@ public class AutomatonTest{
 
 	}
 	
-//	@Test
+	@Test
 	public void testEstrella() throws FileNotFoundException {
-		AutomatonReader reader = new AutomatonReader();
-		Automaton automaton = reader.readAutomaton("./automatas/autToMin.txt");
-		Automaton star = AutomatonOperations.estrella(automaton);
+		Set<Character> sigma = new HashSet<Character>();
+		sigma.add('a');
+		Automaton automaton = unCaracter(sigma, 'a');
+		Automaton star = estrella(automaton);
 		AutomatonWriter writer = new AutomatonWriter();
-		System.out.println("Test estrella");
-		for (State src : automaton.getTransitions().keySet()) {
-			for (Character symbol : automaton.getTransitions().get(src).keySet()) {
-				System.out.println(src.getName() + " -> "
-						+ automaton.getTransitions().get(src).get(symbol).getName()
-						+ "[label=\"" + symbol + "\"]");
-			}
-		}
-		//writer.writeAutomaton(minimized, "./automatas/autMinRes.txt");
 		writer.makeDot("./automatas/dotToStar.txt", automaton);
 		writer.makeDot("./automatas/dotStar.txt", star);
-
 	}
 	
 	
