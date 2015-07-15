@@ -1,4 +1,0 @@
-{CONCAT}3
-	A
-	B
-	C
