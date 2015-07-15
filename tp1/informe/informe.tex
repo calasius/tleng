@@ -1,0 +1,180 @@
+\documentclass[a4paper]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{makeidx}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{float}
+\lstset{language=C++, showstringspaces=false, tabsize=2, breaklines=true, title=\lstname}
+
+\usepackage[margin=0.5in]{geometry}
+
+\title{TP1 Tleng}
+
+\author{-}
+
+\date{\today}
+
+\makeindex
+
+\begin{document}
+\newgeometry{margin=2cm}
+\pagenumbering{gobble}
+\raggedleft
+\includegraphics[width=8cm]{logo_dc.jpg}\\
+
+\raggedright
+\vspace{3cm}
+{\Huge \bfseries Trabajo Práctico 1}
+\rule{\textwidth}{0.02in}
+\large Jueves 2 de julio de 2015 \hfill Teoría de Lenguajes
+\vspace{1.5cm}
+
+ 
+\centering \LARGE 
+\vspace{1.5cm}
+
+\normalsize
+\begin{tabular}{|l@{\hspace{4ex}}c@{\hspace{4ex}}l|}
+        \hline
+        \rule{0pt}{1.2em}Integrante & LU & Correo electr\'onico\\[0.2em]
+        \hline
+        \rule{0pt}{1.2em} Aleman, Damián Eliel &377/10 &\tt damian\_8591@hotmail.com \\[0.2em]
+        \rule{0pt}{1.2em} Gauna, Claudio Andrés &733/06 &\tt gauna\_claudio@yahoo.com.ar\\[0.2em]        
+        \rule{0pt}{1.2em} Vargas Telles, Matías & 318/12 &\tt mvt208@hotmail.com \\[0.2em]
+        \hline
+\end{tabular}
+
+\vspace{1.0cm}
+\raggedright
+
+\begin{multicols}{2}
+\includegraphics[width=8cm]{logo_uba.jpg}
+
+\columnbreak
+\vspace*{4.5cm}
+\raggedleft
+\textbf{Facultad de Ciencias Exactas y Naturales}\\
+Universidad de Buenos Aires\\
+\small
+Ciudad Universitaria - (Pabellon I/Planta Baja)\\
+Intendente G\"uiraldes 2160 - C1428EGA\\
+Ciudad Autonoma de Buenos Aires - Rep. Argentina\\
+Tel/Fax: (54 11) 4576-3359\\
+http://www.fcen.uba.ar
+\end{multicols}
+
+\restoregeometry
+
+\clearpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\vspace{3cm}
+
+\clearpage
+
+
+\section{Introducción}
+Para el presente trabajo se nos solicitó la implementación de diversos algoritmos para autómatas finitos determinísticos.
+\linebreak
+
+Este informe tiene como objetivo acompañar el código entregado para la resolución de los enunciados planteados, permitiendo así su mejor comprensión.\linebreak
+
+
+
+En las siguientes secciones describiremos la representación elegida para los autómata y luego agregaremos documentación sobre los algoritmos implementados.
+
+
+\section{Clase automaton}
+Representamos un automaton con una clase de java. La misma contiene (como atributos privados) un conjunto de caracteres $\sigma$, un diccionario de transiciones \textit{transitions}, un arreglo de estados \textit{states}, un estado inicial \textit{initialState} y un conjunto de estados finales \textit{finalStates}.
+\linebreak
+La interfaz pública permite:
+\begin{itemize}
+\item Crear un automaton
+\item Obtener el iésimo estado
+\item Obtener las transiciones
+\item Consultar si un estado es final
+\item Preguntar por una transición particular (desde un estado mediante un caracter)
+\item Completa un automaton con transiciones lambda.
+\item Obtener los estados (iniciales y finales) y saber si un string es aceptado.
+\end{itemize}
+
+
+\subsection{Clase Automaton Operations}
+La interfaz pública permite :
+\begin{itemize}
+\item Crear el complemento de otro automata
+\item Crear el automata minimizado
+\item Crear la intersección de dos automatas
+\item Crear la unión de dos automatas
+\item Crear la concatenación de dos automatas
+\item Computa si dos automatas son equivalentes
+\item Determinizar un automata
+\end{itemize}
+
+\subsection{Clase Automaton reader}
+En esta clase leemos un archivo que representa un automata con el formato del enunciado y devolvemos un automaton.
+
+
+\subsection{Clase Automaton writer}
+En esta clase escribimos el automata que tenemos como entrada y lo escribimos en un archivo.
+También se encarga de crear el archivo .dot para graficar automatas.
+
+
+\subsection{Clase Regular expression reader}
+En esta clase leemos un archivo que representa una expresión regular con el formato del enunciado y devolvemos un automaton.
+
+\subsection{Clase State }
+Mediante esta clase representamos al estado, que se crea con un nombre
+
+\subsection{Clase Transition }
+Mediante esta clase representamos una transición entre estados. Podemos calcular el origen de la transición, así como también su destino y símbolo correspondiente.
+
+
+\section{Algoritmos principales implementados}
+
+En esta sección describiremos brevemente los algoritmos empleados.
+\subsection{Minimización de AFD}
+Este algoritmo minimiza el automata clasificando a los estados en clases de estados indistinguibles. Se dice que dos estados son indistinguibles cuando para toda transición con origen en los dos estados tiene el mismo destino(o llegan a estados que son indistinguibles, es decir que pertenecen a la misma clase de equivalencia).
+
+\subsection{Decidir si una palabra pertenece al lenguaje}
+Esto lo implementamos en la función reconoce (en la clase Automaton).
+Básicamente, el algoritmo comienza con el estado inicial y va recorriendo desde allí mediante las transiciones, consumiendo los símbolos que forman la palabra. Si se consumieron todos los símbolos y se logró llegar a un estado final, la palabra pertenece al lenguaje, en caso contrario no pertenece al lenguaje.  
+
+\subsection{Determinización de AFND}
+Para un mejor siguemiento de este algoritmo recomendamos tener a mano su pseudocódigo\footnote{ \url{http://web.cecs.pdx.edu/~harry/compilers/slides/LexicalPart3.pdf}}.
+Observamos que en este algoritmo la explosión combinatoria puede generar autómatas con una cantidad de estados notoriamente mayor que los originales, lo cual prolonga considerablemente los tiempos de ejecución y el uso de memoria. Por ejemplo:
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{detExample.jpg}
+\caption{AFND original con 3 estados}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.25]{detExample2.jpg}
+\caption{AFD resultante con 26 estados}
+\end{figure}
+
+\subsection{Clausura $\lambda$}
+Para cada nuevo estado de la determinización es necesario realizar la clausura $\lambda$, es decir, obtener todos los estados alcanzables via transiciones vacías. Para ello procedimos con un algoritmo estilo BFS (con una cola) obteniendo los estados "vecinos" por transiciones $\lambda$.
+\section{Conclusiones}
+En la realización de este trabajo nos topamos con las dificultades que representan la implementación y la ejecución de los algoritmos vistos en clase para AFND (sobre todo aquellos de tiempo exponencial, como la determinización).  
+
+\end{document}

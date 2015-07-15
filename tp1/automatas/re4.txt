@@ -1,0 +1,6 @@
+{OPT}
+		{CONCAT}3
+			b
+			{STAR}
+				a
+			b
