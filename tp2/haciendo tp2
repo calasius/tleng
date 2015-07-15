@@ -1,0 +1,229 @@
+El objetivo del trabajo practico es implementar un parser para un lenguaje orientado a la composicion de piezas musicales, llamado Musileng, que luego sera transformado al formato MIDI 1 para su reproduccion.
+
+Por lo tanto los pasos para realizar el trabajo practico son:
+
+	1. Generar la gramatica adecuada, que sintetice el lenguajeorientado a la composicion de las piezas musicales
+
+	2. Escribir los terminales del lenguaje y las reglas del lexer
+
+	3. Escribir los no termianles del lengueje y las reglas del parser.
+	Agregarle semantica para que pueda imprimir al lenguaje intermedio que pueda ser leido por el programa midcomp
+
+	4. Luego de finalizada la traducci ́on, pueda transformarse a MIDI (.mid) por medio del programa midicomp
+
+Introduccion musical
+
+Una pieza musical esta formada por uan serie de sonidos y silencios
+Cada sonido tiene:
+	Altura: representado por la frecuencia(diferencia entre grave y aguda). Las notas musicales Do re mi fa sol la si representan las diferentes alturas
+	Las usaremos en el sistema americano C, D, E, F, G, A, B respectivamente.
+	Ademas del nombre de la nota, se debera indicar un numero natural que representa en que octava se encuentra la nota
+	(a mas grande el numero mas 	aguda la nota)
+
+	Duracion: indica cuanto se extiende el mismo en el tiempo
+
+Las alteraciones que utilizaremos son:
+	El sostenido,que hace la nota un poco mas aguda —sube un semitono—
+	El bemol, el cual la hace un poco mas grave —baja un semitono.
+
+Las duraciones se representan por figuras:
+	Redonda: unidad basica de referencia de tiempo 
+	Blanca: mitad de una redonda (1/2 de redonda)
+	Negra: mitad de una blanca (1/4 de redonda)
+	Corchea: mitad de una negra (1/8 de redonda)
+	Semicorchea: mitad de una corchea (1/16 de redonda)
+	Fusa: mitad de una semicorchea (1/32 de redonda)
+	Semifusa: mitad de una fusa (1/64 de redonda)
+
+Estas figuras muestran tiempos relativos:
+La duracion real de una nota —medida, por ejemplo, en segundos— depende del tempo utilizado.
+Esto se escribe con una indicacion que le asigna a una figura un numero, el cual representa cuantas veces “entra” esa figura en un minuto.
+
+Puntillo:
+El puntillo se utiliza para modificar la duracion de la figura por la de un tiempo y medio del que ten ́ıa la figura original.
+
+Compas:
+Cada compas contendr ́a una misma cantidad de pulsos o tiempos, cuya unidad es alguna de las figuras indicadas anteriormente. En
+cada tiempo/pulso se puede ejecutar una nota o puede haber un silencio.
+
+El compas se indica mediante una fraccion que representa cuantos pulsos tiene cada
+compas, y en que figura se mide cada pulso. La cantidad de pulsos del compas se escribe en el
+numerador, mientras que el denominador representa la unidad de tiempo de cada pulso, segun los valores numericos
+asociados a las figuras (recordar que redonda = 1, blanca = 2, negra = 4, etc).
+
+Encabezado:
+TEMPO: 	#tempo FIGURA N (Por ejemplo, #tempo redonda 60 indicar ́a que habr ́a 60 redondas por minuto.
+COMPAS: #compas N/M)
+
+CONSTANTES
+const NOMBRE = VALOR;
+donde
+NOMBRE es la cadena con la cual se nombrara dicha constante.
+VALOR es el valor numerico asociado, que podr ́ıa a su vez ser otra constante.
+
+Voces
+Luego del encabezado pueden definirse una o mas voces.
+
+A VER EN LA SEMANTICA:
+1. Todos los compases de las distintas
+voces tienen que tener la misma cantidad de pulsos, la cual est ́a indicada en la definici ́on de
+compas del encabezado.
+2. El interprete deber ́a validar que la sumatoria de las duraciones
+de todas las figuras dentro del compas (ya sean notas o silencios) sea equivalente a lo indicado en
+el encabezado.
+
+Ejemplo: si el encabezado define un comp ́as de 3/4 (tres negras por comp ́as),
+un compas formado por una negra, dos corcheas y cuatro semicorcheas ser ́a v ́alido 4 , mientras que
+un compas formado por dos negras y una blanca ser ́a inv ́alido 5 . Este error deber ́a ser informado
+de forma descriptiva por el interprete.
+
+Notas y Silencios
+	nota(ALTURA, OCTAVA, DURACION);
+
+donde
+ALTURA: pertenece al conjunto {do, re, mi , fa, sol, la , si}. puede esta acompañanada por un sostenid (+) o un bemol (-).
+
+OCTAVA: numero (o constante) del 1 al 9.
+
+
+DURACION:pertenece al conjunto {redonda, blanca,negra, corchea, semicorchea, fusa, semifusa}.
+La duracion puede estar seguida de un punto (sımbolo .), que indica la presencia de un puntillo.
+
+SILENCIOS:
+silencio(DURACION);
+
+
+Bucles:
+
+repetir (N)
+{
+	compas
+	{
+	...
+	}
+	compas
+	{
+	...
+	}
+	...
+}
+
+Comentarios
+Se podran agregar comentarios en las composiciones por medio de la doble barra //, que
+marcara el comienzo de un comentario hasta el pr ́oximo salto de l ́ınea o fin del archivo.
+
+
+Archivo de texto intermedio
+La entrada al programa midicomp consta de un encabezado, seguido de uno o mas tracks.
+Primer track: sirve para hacer definiciones generales a todo el archivo midi.
+El resto de los tracks: detallan la ejecucion de los distintos instrumentos (voces).
+
+Encabezado
+
+MFile 1 NTRACKS 384
+MTrk
+000:00:000 TimeSig COMPAS 24 8
+000:00:000 Tempo TEMPO
+000:00:000 Meta TrkEnd
+TrkEnd
+
+
+NTRACKS: cantVocesNuestroLenguaje +1 (por sumar el track del encabezado)
+COMPAS: N/M (de la misma forma que en nuestro lenguaje).
+TEMPO: 1000000 ∗ 60 ∗ f / (4 ∗ n) (cuantos microsegundos dura una negra). 
+tomando f como la representacion numerica de la figura (redonda = 1, blanca = 2, etc).
+
+Redonda:1 
+Blanca: 2
+Negra: 4
+Corchea: 8
+Semicorchea: 16
+Fusa: 32
+Semifusa: 64
+
+Meta TrkName "Voz NUMERO_DE_VOZ":
+ProgCh ch=CANAL prog=INSTRUMENTO:
+
+COMPAS:PULSO:CLICK
+
+Para el MIDI: pulso =384 clicks
+
+clicks_por_pulso = 384
+clicks_por_redonda = clicks_por_pulso*d
+clicks por figura(f) = clicks_por_redonda / f
+
+donde d es el denominador del comp ́as definido como n/d y f es la representaci ́on num ́erica de
+la figura (redonda = 1, blanca = 2, etc).
+
+Por cada nota se deben generar dos indicaciones: una para “prenderla”, y otra para “apagarla”
+en un tiempo posterior. Al mismo tiempo que se hace sonar una nueva nota, debe apagarse la
+anterior. La sintaxis de estos eventos es la siguiente:
+COMPAS:PULSO:CLICK
+
+STATUS
+ch=CANAL
+note=NOTA
+vol=VOL
+
+Status: On u off (off es 0)
+Canal
+Nota: Nota + (sostenido o bemol)? + octava
+Vol: 70 o 0.
+
+
+Lexer:
+
+Los terminales son:
+// (comentarios)
+#tempo
+#compas
+strings
+numeros
+notas = {blanca,negra,corchea,semicorchea,fusa,semifusa}
+const
+voz
+compas
+{
+}
+repetir
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
